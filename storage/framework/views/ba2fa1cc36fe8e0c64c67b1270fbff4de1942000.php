@@ -108,10 +108,20 @@
                                                         else
                                                             $product_variant_id = null;
                                                         if($product_data->tax_method == 1){
-                                                            $product_price = $product_sale->net_unit_price + ($product_sale->discount / $product_sale->qty);
+                                                            if($product_sale->qty==0){
+                                                                $product_price = $product_sale->net_unit_price;
+                                                            }else{
+                                                                $product_price = $product_sale->net_unit_price + ($product_sale->discount / $product_sale->qty);
+                                                            }
+                                                          
                                                         }
                                                         elseif ($product_data->tax_method == 2) {
-                                                            $product_price =($product_sale->total / $product_sale->qty) + ($product_sale->discount / $product_sale->qty);
+                                                            if($product_sale->qty==0){
+                                                                $product_price = 0;
+                                                            }else{
+                                                                $product_price =($product_sale->total / $product_sale->qty) + ($product_sale->discount / $product_sale->qty);
+                                                            }
+                                                            
                                                         }
 
                                                         $tax = DB::table('taxes')->where('rate',$product_sale->tax_rate)->first();
