@@ -68,7 +68,7 @@
                                         <input type="hidden" name="customer_id_hidden" value="<?php echo e($lims_sale_data->customer_id); ?>">
                                         <?php endif; ?>
                                         <div class="input-group pos">
-                                            <select required name="customer_id" id="customer_id" class="selectpicker form-control" data-live-search="true" data-live-search-style="begins" title="Select customer...">
+                                            <select required name="customer_id" id="customer_id" class="selectpicker js-example-placeholder-single js-states form-control" data-live-search="true" title="Select customer...">
                                             <?php $__currentLoopData = $lims_customer_list; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $customer): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                 <?php $deposit[$customer->id] = $customer->deposit - $customer->expense; ?>
                                                 <option value="<?php echo e($customer->id); ?>"><?php echo e($customer->name . ' (' . $customer->phone_number . ')'); ?></option>
@@ -666,7 +666,9 @@
 </section>
 
 <script type="text/javascript">
-
+$("#customer_id").select2({
+        allowClear: true
+    });
     $("ul#sale").siblings('a').attr('aria-expanded','true');
     $("ul#sale").addClass("show");
     $("ul#sale li").eq(1).addClass("active");

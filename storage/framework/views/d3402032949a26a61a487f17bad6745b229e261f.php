@@ -9,6 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="all,follow">
 
+
     <style type="text/css">
         * {
             font-size: 14px;
@@ -17,7 +18,7 @@
             text-transform: capitalize;
         }
         .btn {
-            padding: 7px 10px;
+            padding: 2px 2px;
             text-decoration: none;
             border: none;
             display: block;
@@ -43,7 +44,7 @@
             border-collapse: collapse;
         }
         tr {border-bottom: 1px dotted #ddd;}
-        td,th {padding: 7px 0;width: 50%;}
+        td,th {padding: 1px 0;width: 50%;}
 
         table {width: 100%;}
         tfoot tr th:first-child {text-align: left;}
@@ -56,10 +57,10 @@
 
         @media  print {
             * {
-                font-size:12px;
+                font-size:14px;
                 line-height: 20px;
             }
-            td,th {padding: 5px 0;}
+            td,th {padding: 1px 0;}
             .hidden-print {
                 display: none !important;
             }
@@ -68,7 +69,7 @@
     </style>
   </head>
 <body>
-
+<?php setlocale(LC_ALL,"es_ES"); ?>
 <div style="max-width:1200px;margin:0 auto">
     <?php if(preg_match('~[0-9]~', url()->previous())): ?>
         <?php $url = '../../pos'; ?>
@@ -89,31 +90,61 @@
             <tbody>
                 <tr>
                     <td class="border-0 pl-0" width="70%">
-                            <p><strong><?php echo e($lims_biller_data->company_name); ?>
-
-                            <br>NIT: <?php echo e($lims_biller_data->vat_number); ?></strong>
-                            <br><strong>DIRECCION: </strong><?php echo e($lims_warehouse_data->address); ?>
-
-                            <br><strong>TELEFONO: </strong><?php echo e($lims_warehouse_data->phone); ?></p>
+                        <?php if($lims_biller_data->company_name == 'PRODECON'): ?>
+                        <img src="<?php echo e(url('public/logo/CERT PRODECON.jpg')); ?>" height="135" width="240" style="margin:1px 0;filter: brightness(1);">
+                        <p><strong>PRODECON
+                        <br>COMERCIALIZADORA DE PRODUCTOS
+                        <br>NIT: <?php echo e($lims_biller_data->vat_number); ?></strong>
+                        </p>
+                        <?php endif; ?>
+                        <?php if($lims_biller_data->company_name == 'DEMACOL'): ?>
+                        <img src="<?php echo e(url('public/logo/DEMACOL.jpg')); ?>" height="135" width="240" style="margin:1px 0;filter: brightness(1);">
+                        <p><strong>DEMACOL
+                        <br>DISTRIBUIDORA DE MATERIALES
+                        <br>NIT: <?php echo e($lims_biller_data->vat_number); ?></strong>
+                        </p>
+                        <?php endif; ?>
+                            
                     </td>
                     <td class="border-0 pl-0">
-                        <?php if($lims_biller_data->company_name == 'PRODECON - COMERCIALIZADORA PRODECON'): ?>
-                        <img src="<?php echo e(url('public/logo/CERT PRODECON.jpg')); ?>" height="135" width="240" style="float:right;margin:1px 0;filter: brightness(1);">
-                        <?php endif; ?>
-                        <?php if($lims_biller_data->company_name == 'DEMACOL - COMERCIALIZADORA DE MATERIALES DE COLOMBIA'): ?>
-                        <img src="<?php echo e(url('public/logo/DEMACOL.jpg')); ?>" height="135" width="240" style="float:right;margin:1px 0;filter: brightness(1);">
-                        <?php endif; ?>
-                        <p><strong>FECHA: <?php echo e($lims_sale_data->created_at); ?></strong>
+                        <?php 
+                        $spanish_months = array(
+                                    'January' => 'enero',
+                                    'February' => 'febrero',
+                                    'March' => 'marzo',
+                                    'April' => 'abril',
+                                    'May' => 'mayo',
+                                    'June' => 'junio',
+                                    'July' => 'julio',
+                                    'August' => 'agosto',
+                                    'September' => 'septiembre',
+                                    'October' => 'octubre',
+                                    'November' => 'noviembre',
+                                    'December' => 'diciembre'
+                                );
+                        $month=date_format(date_create($lims_sale_data->created_at),'F');
+                        $day=date_format(date_create($lims_sale_data->created_at),'d');
+                        $sp_month=$spanish_months[$month];
+                        $lims_dato=date_format(date_create($lims_sale_data->created_at),'Y-F-d');
+                        $lims_data=date_format(date_create($lims_sale_data->created_at),'Y-F-d H:i:s');
+                        $lims_data=str_replace($month, $sp_month, $lims_data);
+ ?>
+                        <p>
                         <?php if($lims_sale_data->reference_no > 1): ?>
-                        <br><strong>REFERENCIA: COTIZACION-<?php echo e($lims_sale_data->reference_no); ?></strong>
+                        <strong style="font-size:20px;">FECHA: <?php echo e($lims_data); ?></strong>
+                        <br><strong style="font-size:20px;">COTIZACION-<?php echo e($lims_sale_data->reference_no); ?></strong>
                         <?php else: ?>
-                        <br><strong>REFERENCIA: <?php echo e($lims_sale_data->reference_no); ?></strong>
+                        <strong style="font-size:20px;">FECHA: <?php echo e($lims_data); ?></strong>
+                        <br><strong style="font-size:20px;"><?php echo e($lims_sale_data->reference_no); ?></strong>
                         <?php endif; ?>
-                        <br><strong>CLIENTE: </strong><?php echo e($lims_customer_data->name); ?>, <?php echo e($lims_customer_data->company_name); ?>
+                        <br><strong style="font-size:20px;">RAZON SOCIAL: <?php echo e($lims_customer_data->company_name); ?></strong>
+                        <br><strong>CLIENTE: </strong><?php echo e($lims_customer_data->name); ?>
 
                         <br><strong>NIT: </strong><?php echo e($lims_customer_data->tax_no); ?>
 
-                        <br><strong>DIRECCION: </strong><?php echo e($lims_customer_data->address); ?>, <?php echo e($lims_customer_data->zone); ?>
+                        <br><strong>DIRECCION: </strong><?php echo e($lims_customer_data->address); ?>
+
+                        <br><strong>ZONA: </strong><?php echo e($lims_customer_data->zone); ?>
 
                         <br><strong>TELEFONO: </strong><?php echo e($lims_customer_data->phone_number); ?></p>
                     </td>
@@ -173,7 +204,7 @@
                 <?php endif; ?>
                 <?php if($lims_sale_data->shipping_cost): ?>
                 <tr style="border-bottom:1px dotted">
-                    <th colspan="3">ICA</th>
+                    <th colspan="3">RETEICA</th>
                     <th style="text-align:right"><?php echo e(number_format((float)$lims_sale_data->shipping_cost, 2, '.', ',')); ?></th>
                 </tr>
                 <?php endif; ?>
@@ -198,8 +229,17 @@
                     <td style="padding: 5px;width:40%"><strong>Cantidad pagada: <?php echo e(number_format((float)$payment_data->amount, 2, '.', ',')); ?></strong></td>
                     <td style="padding: 5px;width:30%"><?php echo e(trans('file.Change')); ?>: <?php echo e(number_format((float)$payment_data->change, 2, '.', ',')); ?></td>
                 </tr>
-                <tr><td class="centered" colspan="3"><strong>GRACIAS POR FREFERIRNOS <?php echo e($lims_biller_data->company_name); ?> SIEMPRE CONTIGO</strong></td></tr>
                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                <tr><td class="left" colspan="3"><strong style="font-size:18px;"><?php echo e($lims_sale_data->sale_note); ?></strong></td></tr>
+                <tr><td class="left" colspan="3"><strong style="font-size:18px;">Firma recibido:___________________________________</strong></td></tr>
+                <?php if($lims_biller_data->company_name == 'PRODECON'): ?>
+                <tr><td class="centered" colspan="3"><strong>CR 86F No 51B-40 SUR BARRIO BETANIA, BOGOTA DC  TELEFONOS: 3136284216 - 3209990744 - 7231772</strong></td></tr>
+                <tr><td class="centered" colspan="3"><strong>GRACIAS POR PREFERIRNOS PRODECON SIEMPRE CONTIGO</strong></td></tr>
+                <?php endif; ?>
+                <?php if($lims_biller_data->company_name == 'DEMACOL'): ?>
+                <tr><td class="centered" colspan="3"><strong>CR 86F No 51B-40 SUR BARRIO BETANIA, BOGOTA DC  TELEFONOS: 3136284216 - 3209990744 - 7231772</strong></td></tr>
+                <tr><td class="centered" colspan="3"><strong>GRACIAS POR PREFERIRNOS DEMACOL SIEMPRE CONTIGO</strong></td></tr>
+                <?php endif; ?>
             </tbody>
         </table>
     <div id="receipt-data">

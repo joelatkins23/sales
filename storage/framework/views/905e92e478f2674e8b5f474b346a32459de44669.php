@@ -417,9 +417,9 @@
                     ])->first();
               ?>
               <?php if($index_permission_active): ?>
-              <li><a href="#event" aria-expanded="false" data-toggle="collapse"> <i class="ion-clock"></i><span><?php echo e(trans('file.Event')); ?></span></a>
+              <li><a href="#event" aria-expanded="false" data-toggle="collapse"> <i class="ion-clock"></i><span>Programar</span></a>
                 <ul id="event" class="collapse list-unstyled ">
-                  <li id="event-list-menu"><a href="<?php echo e(route('event.index')); ?>"><?php echo e(trans('file.Event list')); ?></a></li>
+                  <li id="event-list-menu"><a href="<?php echo e(route('event.index')); ?>">Listado</a></li>
                   <?php 
                     $add_permission = DB::table('permissions')->where('name', 'event-add')->first();
                     $add_permission_active = DB::table('role_has_permissions')->where([
@@ -428,7 +428,7 @@
                     ])->first();
                   ?>
                   <?php if($add_permission_active): ?>
-                  <li id="event-create-menu"><a href="<?php echo e(route('event.create')); ?>"><?php echo e(trans('file.Add Event')); ?></a></li>
+                  <li id="event-create-menu"><a href="<?php echo e(route('event.create')); ?>">Agregar</a></li>
                   <?php endif; ?>
                 </ul>
               </li>
@@ -441,7 +441,7 @@
                     ])->first();
               ?>
               <?php if($index_permission_active): ?>
-              <li><a href="<?php echo e(route('calendar.index')); ?>" > <i class="ion-calendar"></i><span><?php echo e(trans('file.Calendar')); ?></span></a>
+              <li><a href="<?php echo e(route('calendar.index')); ?>" > <i class="ion-calendar"></i><span>Calendario</span></a>
                
               </li>
               <?php endif; ?>
@@ -561,6 +561,16 @@
                         ->where([
                           ['permissions.name', 'purchase-report'],
                           ['role_id', $role->id] ])->first();
+                  $sales_report_active = DB::table('permissions')
+                          ->join('role_has_permissions', 'permissions.id', '=', 'role_has_permissions.permission_id')
+                          ->where([
+                            ['permissions.name', 'sales-report'],
+                            ['role_id', $role->id] ])->first();
+                  $purchases_report_active = DB::table('permissions')
+                            ->join('role_has_permissions', 'permissions.id', '=', 'role_has_permissions.permission_id')
+                            ->where([
+                              ['permissions.name', 'purchases-report'],
+                              ['role_id', $role->id] ])->first();
                   $sale_report_active = DB::table('permissions')
                         ->join('role_has_permissions', 'permissions.id', '=', 'role_has_permissions.permission_id')
                         ->where([
@@ -606,6 +616,31 @@
                     <input type="hidden" name="start_date" value="<?php echo e(date('Y-m').'-'.'01'); ?>" />
                     <input type="hidden" name="end_date" value="<?php echo e(date('Y-m-d')); ?>" />
                     <a id="profitLoss-link" href=""><?php echo e(trans('file.Summary Report')); ?></a>
+                    <?php echo Form::close(); ?>
+
+                  </li>
+                  <?php endif; ?>
+                  
+                  <?php if($sales_report_active): ?>
+                  <li id="sales-report-menu">
+                    <?php echo Form::open(['route' => 'report.sales', 'method' => 'post', 'id' => 'sales-report-form']); ?>
+
+                    <input type="hidden" name="start_date" value="1988-04-18" />
+                    <input type="hidden" name="end_date" value="<?php echo e(date('Y-m-d')); ?>" />
+                    <input type="hidden" name="biller_id" value="0" />
+                    <a id="sales-link" href=""><?php echo e(trans('file.Sales Report')); ?></a>
+                    <?php echo Form::close(); ?>
+
+                  </li>
+                  <?php endif; ?>
+                  <?php if($purchases_report_active): ?>
+                  <li id="purchases-report-menu">
+                    <?php echo Form::open(['route' => 'report.purchases', 'method' => 'post', 'id' => 'purchases-report-form']); ?>
+
+                    <input type="hidden" name="start_date" value="1988-04-18" />
+                    <input type="hidden" name="end_date" value="<?php echo e(date('Y-m-d')); ?>" />
+                    <input type="hidden" name="supplier_id" value="0" />
+                    <a id="purchases-link" href=""><?php echo e(trans('file.Purchases Report')); ?></a>
                     <?php echo Form::close(); ?>
 
                   </li>
@@ -1439,7 +1474,14 @@
         e.preventDefault();
         $("#purchase-report-form").submit();
       });
-
+      $("a#sales-link").click(function(e){
+        e.preventDefault();
+        $("#sales-report-form").submit();
+      });
+      $("a#purchases-link").click(function(e){
+        e.preventDefault();
+        $("#purchases-report-form").submit();
+      });
       $("a#sale-report-link").click(function(e){
         e.preventDefault();
         $("#sale-report-form").submit();

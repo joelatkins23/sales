@@ -84,7 +84,7 @@
                                                         <th><?php echo e(trans('file.Code')); ?></th>
                                                         <th><?php echo e(trans('file.Quantity')); ?></th>
                                                         <th><?php echo e(trans('file.Net Unit Price')); ?></th>
-                                                        <th><?php echo e(trans('file.Discount')); ?></th>
+                                                        <th><?php echo e(trans('Total Weight')); ?></th>
                                                         <th><?php echo e(trans('file.Tax')); ?></th>
                                                         <th><?php echo e(trans('file.Subtotal')); ?></th>
                                                         <th><i class="fa fa-trash"></i></th>
@@ -155,7 +155,7 @@
                                                         <td><?php echo e($product_data->code); ?></td>
                                                         <td><input type="number" class="form-control qty" name="qty[]" value="<?php echo e($product_sale->qty); ?>" step="any" required/></td>
                                                         <td class="net_unit_price"><?php echo e(number_format((float)$product_sale->net_unit_price, 2, '.', '')); ?> </td>
-                                                        <td class="discount"><?php echo e(number_format((float)$product_sale->discount, 2, '.', '')); ?></td>
+                                                        <td class="discount"><?php echo e(number_format((float)($product_data->weight*$product_sale->qty), 2, '.', '')); ?></td>
                                                         <td class="tax"><?php echo e(number_format((float)$product_sale->tax, 2, '.', '')); ?></td>
                                                         <td class="sub-total"><?php echo e(number_format((float)$product_sale->total, 2, '.', '')); ?></td>
                                                         <td><button type="button" class="ibtnDel btn btn-md btn-danger"><?php echo e(trans("file.delete")); ?></button></td>
@@ -167,7 +167,7 @@
                                                         <input type="hidden" class="sale-unit-operator" value="<?php echo e($unit_operator); ?>"/>
                                                         <input type="hidden" class="sale-unit-operation-value" value="<?php echo e($unit_operation_value); ?>"/>
                                                         <input type="hidden" class="net_unit_price" name="net_unit_price[]" value="<?php echo e($product_sale->net_unit_price); ?>" />
-                                                        <input type="hidden" class="discount-value" name="discount[]" value="<?php echo e($product_sale->discount); ?>" />
+                                                        <input type="hidden" class="discount-value" name="discount[]" value="<?php echo e($product_data->weight*$product_sale->qty); ?>" />
                                                         <input type="hidden" class="tax-rate" name="tax_rate[]" value="<?php echo e($product_sale->tax_rate); ?>"/>
                                                         <?php if($tax): ?>
                                                         <input type="hidden" class="tax-name" value="<?php echo e($tax->name); ?>" />
@@ -184,7 +184,7 @@
                                                     <th colspan="2"><?php echo e(trans('file.Total')); ?></th>
                                                     <th id="total-qty"><?php echo e($lims_sale_data->total_qty); ?></th>
                                                     <th></th>
-                                                    <th id="total-discount"><?php echo e(number_format((float)$lims_sale_data->total_discount, 2, '.', ',')); ?></th>
+                                                    <th id="total-discount"><?php echo e(number_format((float)$lims_sale_data->total_weight, 2, '.', ',')); ?></th>
                                                     <th id="total-tax"><?php echo e(number_format((float)$lims_sale_data->total_tax, 2, '.', ',')); ?></th>
                                                     <th id="total"><?php echo e(number_format((float)$lims_sale_data->total_price, 2, '.', ',')); ?></th>
                                                     <th><i class="fa fa-trash"></i></th>
@@ -201,7 +201,7 @@
                                     </div>
                                     <div class="col-md-2">
                                         <div class="form-group">
-                                            <input type="hidden" name="total_discount" value="<?php echo e($lims_sale_data->total_discount); ?>" />
+                                            <input type="hidden" name="total_discount" value="<?php echo e($lims_sale_data->total_weight); ?>" />
                                         </div>
                                     </div>
                                     <div class="col-md-2">
@@ -288,6 +288,7 @@
                                             <select name="sale_status" class="form-control">
                                                 <option value="1"><?php echo e(trans('file.Completed')); ?></option>
                                                 <option value="2"><?php echo e(trans('file.Pending')); ?></option>
+                                                <option value="4"><?php echo e(trans('file.Incomplete')); ?></option>
                                             </select>
                                         </div>
                                     </div>
@@ -631,7 +632,7 @@ $('button[name="update_btn"]').on("click", function() {
         unit_operator[rowindex] = temp_unit_operator.toString() + ',';
         unit_operation_value[rowindex] = temp_unit_operation_value.toString() + ',';
     }
-    product_discount[rowindex] = $('input[name="edit_discount"]').val();
+    //product_discount[rowindex] = $('input[name="edit_discount"]').val();
     checkQuantity(edit_qty, false);
 });
 
@@ -792,7 +793,8 @@ function calculateRowProductData(quantity) {
     $('table.order-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('.tax-rate').val(tax_rate[rowindex].toFixed(2));
 
     if (tax_method[rowindex] == 1) {
-        var net_unit_price = row_product_price - product_discount[rowindex];
+        // var net_unit_price = row_product_price - product_discount[rowindex];
+        var net_unit_price = row_product_price ;
         var tax = net_unit_price * quantity * (tax_rate[rowindex] / 100);
         var sub_total = (net_unit_price * quantity) + tax;
 

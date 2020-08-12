@@ -263,6 +263,7 @@
                                             <select name="sale_status" class="form-control">
                                                 <option value="1"><?php echo e(trans('file.Completed')); ?></option>
                                                 <option value="2"><?php echo e(trans('file.Pending')); ?></option>
+                                                <option value="4"><?php echo e(trans('file.Incomplete')); ?></option>
                                             </select>
                                         </div>
                                     </div>

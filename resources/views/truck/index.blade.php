@@ -39,15 +39,15 @@
                                 <span class="sr-only">Toggle Dropdown</span>
                             </button>
                             <ul class="dropdown-menu edit-options dropdown-menu-right dropdown-default" user="menu">
-                                <li><button type="button" data-id="{{$truck->id}}" data-name="{{$truck->name}}" data-model="{{$truck->model}}" data-identification="{{$truck->identification}}" data-driver_name="{{$truck->driver_name}}" data-capacity="{{$truck->capacity}}" data-unit_id="{{$truck->unit->id}}" class="edit-btn btn btn-link" data-toggle="modal" data-target="#truck-edit-modal"><i class="fa fa-edit"></i> {{trans('file.edit')}}</button></li>
+                                <!--<li><button type="button" data-id="{{$truck->id}}" data-name="{{$truck->name}}" data-model="{{$truck->model}}" data-identification="{{$truck->identification}}" data-driver_name="{{$truck->driver_name}}" data-capacity="{{$truck->capacity}}" data-unit_id="{{$truck->unit->id}}" class="edit-btn btn btn-link" data-toggle="modal" data-target="#truck-edit-modal"><i class="fa fa-edit"></i> {{trans('file.edit')}}</button></li>-->
                                 <li><a href="{{route('trucks.transactionDetails', $truck->id)}}" class="btn btn-link"><i class="ion-ios-paper-outline"></i> Listado</a></li>
                                 <li><a href="{{route('trucks.daytransactionDetails', $truck->id)}}" class="btn btn-link"><i class="ion-ios-paper-outline"></i> List(Day)</a></li>
-                                <li class="divider"></li>
+                                <!--<li class="divider"></li>
                                 {{ Form::open(['route' => ['trucks.destroy', $truck->id], 'method' => 'DELETE'] ) }}
                                 <li>
                                     <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="fa fa-trash"></i> {{trans('file.delete')}}</button>
                                 </li>
-                                {{ Form::close() }}
+                                {{ Form::close() }}-->
                             </ul>
                         </div>
                     </td>

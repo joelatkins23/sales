@@ -7,12 +7,35 @@
 @endif
 
 <section>
+    {!! Form::open(['route' => 'delivery.dayrange', 'method' => 'post']) !!}
+    <div class="row mt-4">
+        <div class="col-md-4 offset-md-3 ">
+       
+            <div class="form-group row">
+                <label class="d-tc mt-2"><strong>{{trans('file.Choose Your Date')}}</strong> &nbsp;</label>
+                <div class="d-tc">
+                    <div class="input-group">
+                        <input type="text" class="daterangepicker-field form-control" value="{{$start_date}} To {{$end_date}}" required />
+                        <input type="hidden" name="start_date" value="{{$start_date}}" />
+                        <input type="hidden" name="end_date" value="{{$end_date}}" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">       
+            <div class="form-group row">
+                <button class="btn btn-primary" type="submit">{{trans('file.submit')}}</button>
+            </div>
+        </div>
+    </div>
+    {!! Form::close() !!}
     <div class="table-responsive">
         <table id="delivery-table" class="table table-striped">
             <thead>
                 <tr>
                     <th class="not-exported"></th>
                     <th>Asignacion</th>
+                    <th>{{trans('file.Date')}}</th>
                     <th>{{trans('file.Sale Reference')}}</th>
                     <th>{{trans('file.customer')}}</th>
                     <th>{{trans('file.Address')}}</th>
@@ -24,38 +47,78 @@
                 @foreach($lims_delivery_all as $key=>$delivery)
                 <?php 
                     $customer_sale = DB::table('sales')->join('customers', 'sales.customer_id', '=', 'customers.id')->where('sales.id', $delivery->sale_id)->select('sales.reference_no','customers.name')->get();
-
+                    $create_date = explode(" ", $delivery->created_at)[0];
+                    $result_customer = App\Customer::find($delivery->sale->customer_id);
+                    $customer_info='';
+                             
+                    $customer_info = $result_customer->name;
+                    if($result_customer->zone)
+                        $customer_info .= ' ['.$result_customer->zone.']';
+                    if($result_customer->company_name)
+                        $customer_info .= ' ['.$result_customer->company_name.']';
                     if($delivery->status == 1)
                         $status = trans('file.Packing');
                     elseif($delivery->status == 2)
                         $status = trans('file.Delivering');
+                    elseif($delivery->status == 4)
+                        $status = trans('file.Collect');
                     else
                         $status = trans('file.Delivered');
                 ?>
                 <tr data-id="{{$delivery->id}}">
                     <td>{{$key}}</td>
                     @if($delivery->truck_id == '1')
-                    <td>Cheyene David</td>
+                    <td>SRD520-1</td>
                     @elseif($delivery->truck_id == '2')
-                    <td>Worker Milton</td>
+                    <td>WORKER 1</td>
                     @elseif($delivery->truck_id == '3')
-                    <td>Cheyene Edilbert</td>
+                    <td>BEP429-1</td>
                     @elseif($delivery->truck_id == '4')
-                    <td>Ford cargo Norbey</td>
+                    <td>CARGO 1</td>
                     @elseif($delivery->truck_id == '5')
-                    <td>JAC Fredy</td>
+                    <td>JAC-1</td>
                     @elseif($delivery->truck_id == '6')
-                    <td>Moto Jesus</td>
+                    <td>HKA31E</td>
                     @elseif($delivery->truck_id == '7')
-                    <td>Moto Daniel</td>
+                    <td>NQR36E</td>
+                    @elseif($delivery->truck_id == '11')
+                    <td>CON-PEDIDO</td>
+                    @elseif($delivery->truck_id == '12')
+                    <td>LLAMAR</td>
+                    @elseif($delivery->truck_id == '13')
+                    <td>CONSIGNA</td>
+                    @elseif($delivery->truck_id == '14')
+                    <td>BEP429-2</td>
+                    @elseif($delivery->truck_id == '15')
+                    <td>SRD520-2</td>
+                    @elseif($delivery->truck_id == '16')
+                    <td>JAC-2</td>
+                    @elseif($delivery->truck_id == '18')
+                    <td>WORKER 2</td>
+                    @elseif($delivery->truck_id == '19')
+                    <td>CARGO 2</td>
+                    @elseif($delivery->truck_id == '20')
+                    <td>Sobrantes CARGO</td>
+                    @elseif($delivery->truck_id == '21')
+                    <td>Sobrantes WORKER</td>
+                    @elseif($delivery->truck_id == '22')
+                    <td>Sobrantes 520</td>
+                    @elseif($delivery->truck_id == '23')
+                    <td>Sobrantes 429</td>
+                    @elseif($delivery->truck_id == '24')
+                    <td>Sobrantes JAC</td>
+                    
                     @endif
+                    <td>{{$create_date}}</td>
                     <td>{{ $customer_sale[0]->reference_no }}</td>
-                    <td>{{ $customer_sale[0]->name }}</td>
+                    <td>{{ $customer_info }}</td>
                     <td>{{ $delivery->address }}</td>
                     @if($delivery->status == 1)
                     <td><div class="badge badge-info">{{$status}}</div></td>
                     @elseif($delivery->status == 2)
                     <td><div class="badge badge-primary">{{$status}}</div></td>
+                    @elseif($delivery->status == 4)
+                    <td><div class="badge badge-success">{{$status}}</div></td>
                     @else
                     <td><div class="badge badge-success">{{$status}}</div></td>
                     @endif
@@ -84,6 +147,7 @@
         </table>
     </div>
 </seaction>
+
 <!-- Modal -->
 <div id="edit-delivery" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
     <div role="document" class="modal-dialog">
@@ -107,17 +171,12 @@
                         <p id="sr"></p>
                     </div>
                     <div class="col-md-6 form-group">
-                        <label><strong>{{trans('file.Delivery')}} {{trans('file.Date')}}</strong></label>
-                        <input type="date" name="delivery_date" class="form-control"  placeholder="dd-mm-yyyy">
-                    </div>
-                    <div class="col-md-6 form-group">                       
-                    </div>
-                    <div class="col-md-6 form-group">
                         <label><strong>{{trans('file.Status')}} *</strong></label>
                         <select name="status" required class="form-control selectpicker">
                             <option value="1">{{trans('file.Packing')}}</option>
                             <option value="2">{{trans('file.Delivering')}}</option>
                             <option value="3">{{trans('file.Delivered')}}</option>
+                            <option value="4">{{trans('file.Collect')}}</option>
                         </select>
                     </div>
                     <div class="col-md-6 form-group">
@@ -201,12 +260,21 @@ $(document).ready(function() {
             $('input[name="reference_no"]').val(data[0]);
             $('input[name="delivery_id"]').val(id);
             $('#edit-delivery select[name="truck_id"]').val(data[8]);
-            $('input[name="delivery_date"]').val(data[9]);
             $('.selectpicker').selectpicker('refresh');
 
       });
       $("#edit-delivery").modal('show');
     });
+});
+$(".daterangepicker-field").daterangepicker({
+  callback: function(startDate, endDate, period){
+    var start_date = startDate.format('YYYY-MM-DD');
+    var end_date = endDate.format('YYYY-MM-DD');
+    var title = start_date + ' To ' + end_date;
+    $('.daterangepicker-field').val(title);
+    $('input[name="start_date"]').val(start_date);
+    $('input[name="end_date"]').val(end_date);
+  }
 });
 
     $('#delivery-table').DataTable( {
@@ -223,7 +291,7 @@ $(document).ready(function() {
         'columnDefs': [
             {
                 "orderable": false,
-                'targets': [0, 6]
+                'targets': [0, 7]
             },
             {
                 'checkboxes': {

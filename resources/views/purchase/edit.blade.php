@@ -22,17 +22,6 @@
                                             <input type="text" name="reference_no" class="form-control" value="{{ $lims_purchase_data->reference_no }}" required>
                                         </div>
                                     </div>
-                                    <div class="col-md-4">                                 
-                                        <div class="form-group">
-                                            <label><strong>{{trans('file.Biller')}} *</strong></label>
-                                            <input type="hidden" name="biller_id_hidden" value="{{$lims_purchase_data->biller_id}}" />
-                                            <select required name="biller_id" class="selectpicker form-control" data-live-search="true" data-live-search-style="begins" title="Select Biller...">
-                                                @foreach($lims_biller_list as $biller)
-                                                <option value="{{$biller->id}}">{{$biller->name . ' (' . $biller->company_name . ')'}}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label><strong>{{trans('file.Warehouse')}} *</strong></label>
@@ -44,9 +33,6 @@
                                             </select>
                                         </div>
                                     </div>
-                                    
-                                </div>
-                                <div class="row">
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label><strong>{{trans('file.Supplier')}}</strong></label>
@@ -58,6 +44,8 @@
                                             </select>
                                         </div>
                                     </div>
+                                </div>
+                                <div class="row">
                                 	<div class="col-md-4">
                                         <div class="form-group">
                                             <label><strong>{{trans('file.Purchase Status')}}</strong></label>
@@ -236,7 +224,7 @@
                                 <div class="row mt-5">
                                     <div class="col-md-4">
                                         <div class="form-group">
-                                            <label><strong>{{trans('file.Order Tax')}}</strong></label>
+                                            <label><strong>IVA</strong></label>
                                             <input type="hidden" name="order_tax_rate_hidden" value="{{$lims_purchase_data->order_tax_rate}}">
                                             <select class="form-control" name="order_tax_rate">
                                                 <option value="0">{{trans('file.No Tax')}}</option>
@@ -249,7 +237,7 @@
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label>
-                                                <strong>{{trans('file.Discount')}}</strong>
+                                                <strong>Retencion</strong>
                                             </label>
                                             <input type="number" name="order_discount" class="form-control" value="{{$lims_purchase_data->order_discount}}" step="any" />
                                         </div>
@@ -257,7 +245,7 @@
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label>
-                                                <strong>{{trans('file.Shipping Cost')}}</strong>
+                                                <strong>ICA</strong>
                                             </label>
                                             <input type="number" name="shipping_cost" class="form-control" value="{{$lims_purchase_data->shipping_cost}}" step="any" />
                                         </div>
@@ -290,13 +278,13 @@
             <td><strong>{{trans('file.Total')}}</strong>
                 <span class="pull-right" id="subtotal">0.00</span>
             </td>
-            <td><strong>{{trans('file.Order Tax')}}</strong>
+            <td><strong>IVA</strong>
                 <span class="pull-right" id="order_tax">0.00</span>
             </td>
-            <td><strong>{{trans('file.Order Discount')}}</strong>
+            <td><strong>Retencion</strong>
                 <span class="pull-right" id="order_discount">0.00</span>
             </td>
-            <td><strong>{{trans('file.Shipping Cost')}}</strong>
+            <td><strong>ICA</strong>
                 <span class="pull-right" id="shipping_cost">0.00</span>
             </td>
             <td><strong>{{trans('file.grand total')}}</strong>
@@ -411,7 +399,6 @@ $('[data-toggle="tooltip"]').tooltip();
 //assigning value
 $('select[name="supplier_id"]').val($('input[name="supplier_id_hidden"]').val());
 $('select[name="warehouse_id"]').val($('input[name="warehouse_id_hidden"]').val());
-$('select[name="biller_id"]').val($('input[name="biller_id_hidden"]').val());
 $('select[name="status"]').val($('input[name="status_hidden"]').val());
 $('select[name="order_tax_rate"]').val($('input[name="order_tax_rate_hidden"]').val());
 $('select[name="purchase_status"]').val($('input[name="purchase_status_hidden"]').val());
@@ -779,8 +766,8 @@ function calculateGrandTotal() {
         shipping_cost = 0.00;
 
     item = ++item + '(' + total_qty + ')';
-    order_tax = (subtotal - order_discount) * (order_tax / 100);
-    var grand_total = (subtotal + order_tax + shipping_cost) - order_discount;
+    order_tax = (subtotal) * (order_tax / 100);
+    var grand_total = (subtotal + order_tax ) - shipping_cost - order_discount;
 
     $('#item').text(item);
     $('input[name="item"]').val($('table.order-list tbody tr:last').index() + 1);

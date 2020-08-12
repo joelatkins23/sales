@@ -8,10 +8,56 @@
 
 <section>
     <div class="container-fluid">
-        @if(in_array("sales-add", $all_permission))
-            <a href="{{route('sales.create')}}" class="btn btn-info"><i class="fa fa-plus"></i> {{trans('file.Add Sale')}}</a>&nbsp;
-            <a href="{{url('sales/sale_by_csv')}}" class="btn btn-primary"><i class="fa fa-file"></i> {{trans('file.Import Sale')}}</a>
-        @endif
+        <div class="row">
+            <div class="col-md-4">
+                @if(in_array("sales-add", $all_permission))
+                    <a href="{{route('sales.create')}}" class="btn btn-info"><i class="fa fa-plus"></i> {{trans('file.Add Sale')}}</a>&nbsp;
+                    <a href="{{url('sales/sale_by_csv')}}" class="btn btn-primary"><i class="fa fa-file"></i> {{trans('file.Import Sale')}}</a>
+                @endif
+            </div>            
+        </div> 
+        {!! Form::open(['route' => 'sale.satus_list', 'method' => 'post']) !!}
+                <div class="row mt-3">
+                    <div class="offset-md-1 col-md-4">
+                        <div class="form-group row">
+                            <label class="d-tc mt-2"><strong>{{trans('file.Choose Your Date')}}</strong> &nbsp;</label>
+                            <div class="d-tc">
+                                <div class="input-group">
+                                    <input type="text" class="daterangepicker-field form-control"  value="{{$start_date}} To {{$end_date}}" id="title_date" required />
+                                    <input type="hidden" name="start_date" id="sstart" value="{{$start_date}}" />
+                                    <input type="hidden" name="end_date" id="estart" value="{{$end_date}}" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>                    
+                    <div class="col-md-2">
+                        <div class="form-group row">
+                            <select name="sale_status" class="form-control">
+                                <option value="">select status</option>
+                                <option   value="1">{{trans('file.Completed')}}</option>
+                                <option  value="2">{{trans('file.Pending')}}</option>
+                                <option value="4">{{trans('file.Incomplete')}}</option>
+                                </select>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group row">                           
+                            <select name="client_id" id="" class="form-control select2">
+                                <option value="">select Client</option>
+                                @foreach($client_list as $key=>$client)
+                                <option value="{{$client->zone}}">{{$client->zone}}</option>
+                                @endforeach
+                            </select>
+                            
+                        </div>
+                    </div>                    
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <button class="btn btn-primary" type="submit">{{trans('file.submit')}}</button>
+                        </div>
+                    </div>
+                </div>               
+                {!! Form::close() !!}             
     </div>
     <div class="table-responsive">
         <table id="sale-table" class="table table-striped sale-list" style="width: 100%">
@@ -19,12 +65,14 @@
                 <tr>
                     <th class="not-exported"></th>
                     <th>{{trans('file.Delivery Status')}}</th>
+                    <th>{{trans('file.Trucks')}}</th>
                     <th>{{trans('file.Date')}}</th>                    
                     <th>{{trans('file.reference')}}</th>
                     <th>{{trans('file.Biller')}}</th>
                     <th>{{trans('file.customer')}}</th>
                     <th>{{trans('file.Sale Status')}}</th>
                     <th>{{trans('file.Payment Status')}}</th>
+                    <th>Total Weight</th>
                     <th>{{trans('file.grand total')}}</th>
                     <th>{{trans('file.Paid')}}</th>
                     <th>{{trans('file.Due')}}</th>
@@ -36,6 +84,8 @@
                 <th></th>
                 <th></th>
                 <th>{{trans('file.Total')}}</th>
+                <th></th>
+                <th></th>
                 <th></th>
                 <th></th>
                 <th></th>
@@ -84,7 +134,7 @@
                     <th>{{trans('file.Qty')}}</th>
                     <th>{{trans('file.Unit Price')}}</th>
                     <th>{{trans('file.Tax')}}</th>
-                    <th>{{trans('file.Discount')}}</th>
+                    <th>Total Weight</th>
                     <th>{{trans('file.Subtotal')}}</th>
                 </thead>
                 <tbody>
@@ -298,20 +348,15 @@
                     $lims_truck_list = \App\Truck::all();
                 ?>
                 <div class="row">
-                    
                     <div class="col-md-6 form-group">
                         <label><strong>{{trans('file.Delivery Reference')}}</strong></label>
                         <p id="dr"></p>
+                        <label><strong>{{trans('file.Date')}}</strong><input type="text" data-date-format='yyyy-mm-dd' id="datepicker" name="create_date" class="form-control"></label>
+
                     </div>
                     <div class="col-md-6 form-group">
                         <label><strong>{{trans('file.Sale Reference')}}</strong></label>
                         <p id="sr"></p>
-                    </div>
-                    <div class="col-md-6 form-group">
-                        <label><strong>{{trans('file.Delivery')}} {{trans('file.Date')}}</strong></label>
-                        <input type="date" name="delivery_date" class="form-control" value="{{date('Y-m-d')}}" placeholder="dd-mm-yyyy">
-                    </div>
-                    <div class="col-md-6 form-group">                       
                     </div>
                     <div class="col-md-6 form-group">
                         <label><strong>{{trans('file.Status')}} *</strong></label>
@@ -319,6 +364,7 @@
                             <option value="1">{{trans('file.Packing')}}</option>
                             <option value="2">{{trans('file.Delivering')}}</option>
                             <option value="3">{{trans('file.Delivered')}}</option>
+                            <option value="4">{{trans('file.Collect')}}</option>
                         </select>
                     </div>
                     <div class="col-md-6 form-group">
@@ -364,7 +410,12 @@
 </div>
 
 <script type="text/javascript">
-
+    // $( function() {
+    //     $( "#datepicker" ).datepicker();
+    //   } );
+    $('#datepicker').datepicker({
+      dateFormat: 'yyyy-mm-dd'
+    });
     $("ul#sale").siblings('a').attr('aria-expanded','true');
     $("ul#sale").addClass("show");
     $("ul#sale #sale-list-menu").addClass("active");
@@ -424,7 +475,7 @@
         rowindex = $(this).closest('tr').index();
         deposit = $('table.sale-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('.deposit').val();
         var sale_id = $(this).data('id').toString();
-        var balance = $('table.sale-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('td:nth-child(11)').text();
+        var balance = $('table.sale-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('td:nth-child(13)').text();
         balance = parseFloat(balance.replace(/,/g, ''));
         $('input[name="paying_amount"]').val(balance);
         $('#add-payment input[name="balance"]').val(balance);
@@ -693,12 +744,14 @@
         "columns": [
             {"data": "key"},
             {"data": "delivery_status"},
+            {"data": "trucks_name"},            
             {"data": "date"},
             {"data": "reference_no"},
             {"data": "biller"},
             {"data": "customer"},
             {"data": "sale_status"},
             {"data": "payment_status"},
+            {"data": "total_weight"},
             {"data": "grand_total"},
             {"data": "paid_amount"},
             {"data": "due"},
@@ -714,11 +767,11 @@
                     'next': '{{trans("file.Next")}}'
             }
         },
-        order:[['1', 'desc']],
+        order:[['2', 'desc']],
         'columnDefs': [
             {
                 "orderable": false,
-                'targets': [0, 3, 4, 5, 6, 9, 10]
+                'targets': [0, 1, 4, 5, 11, 12]
             },
             {
                 'checkboxes': {
@@ -820,15 +873,16 @@
     function datatable_sum(dt_selector, is_calling_first) {
         if (dt_selector.rows( '.selected' ).any() && is_calling_first) {
             var rows = dt_selector.rows( '.selected' ).indexes();
-
-            $( dt_selector.column( 8 ).footer() ).html(dt_selector.cells( rows, 8, { page: 'current' } ).data().sum().toFixed(2));
             $( dt_selector.column( 9 ).footer() ).html(dt_selector.cells( rows, 9, { page: 'current' } ).data().sum().toFixed(2));
             $( dt_selector.column( 10 ).footer() ).html(dt_selector.cells( rows, 10, { page: 'current' } ).data().sum().toFixed(2));
+            $( dt_selector.column( 11 ).footer() ).html(dt_selector.cells( rows, 11, { page: 'current' } ).data().sum().toFixed(2));
+            $( dt_selector.column( 12).footer() ).html(dt_selector.cells( rows, 12, { page: 'current' } ).data().sum().toFixed(2));
         }
         else {
-            $( dt_selector.column( 8 ).footer() ).html(dt_selector.cells( rows, 8, { page: 'current' } ).data().sum().toFixed(2));
             $( dt_selector.column( 9 ).footer() ).html(dt_selector.cells( rows, 9, { page: 'current' } ).data().sum().toFixed(2));
             $( dt_selector.column( 10 ).footer() ).html(dt_selector.cells( rows, 10, { page: 'current' } ).data().sum().toFixed(2));
+            $( dt_selector.column( 11 ).footer() ).html(dt_selector.cells( rows, 11, { page: 'current' } ).data().sum().toFixed(2));
+            $( dt_selector.column( 12 ).footer() ).html(dt_selector.cells( rows, 12, { page: 'current' } ).data().sum().toFixed(2));
         }
     }
 
@@ -837,6 +891,7 @@
 
         var htmltext = '<strong>{{trans("file.Date")}}: </strong>'+sale[0]+'<br><strong>{{trans("file.reference")}}: </strong>'+sale[1]+'<br><strong>{{trans("file.Warehouse")}}: </strong>'+sale[27]+'<br><strong>{{trans("file.Sale Status")}}: </strong>'+sale[2]+'<br><br><div class="row"><div class="col-md-6"><strong>{{trans("file.From")}}:</strong><br>'+sale[3]+'<br>'+sale[4]+'<br>'+sale[5]+'<br>'+sale[6]+'<br>'+sale[7]+'<br>'+sale[8]+'</div><div class="col-md-6"><div class="float-right"><strong>{{trans("file.To")}}:</strong><br>'+sale[9]+'<br>'+sale[10]+'<br>'+sale[11]+'<br>'+sale[12]+'</div></div></div>';
         $.get('sales/product_sale/' + sale[13], function(data){
+            console.log(data);
             $(".product-sale-list tbody").remove();
             var name_code = data[0];
             var qty = data[1];
@@ -854,7 +909,7 @@
                 cols += '<td>' + qty[index] + ' ' + unit_code[index] + '</td>';
                 cols += '<td>' + parseFloat(subtotal[index] / qty[index]).toFixed(2) + '</td>';
                 cols += '<td>' + tax[index] + '(' + tax_rate[index] + '%)' + '</td>';
-                cols += '<td>' + discount[index] + '</td>';
+                cols += '<td>' + parseFloat(discount[index]*qty[index]).toFixed(2) + '</td>';
                 cols += '<td>' + subtotal[index] + '</td>';
                 newRow.append(cols);
                 newBody.append(newRow);
@@ -960,7 +1015,20 @@
         }
         return false;
     }
-
+    var prev_date = new Date();
+        prev_date.setDate(prev_date.getDate() + 30000);  
+        $(".daterangepicker-field").daterangepicker({
+            maxDate: prev_date,
+        callback: function(startDate, endDate, period){
+            var start_date = startDate.format('YYYY-MM-DD');
+            var end_date = endDate.format('YYYY-MM-DD');
+            var title = start_date + ' To ' + end_date;
+            $(".daterangepicker-field").val(title);
+            $('input[name="start_date"]').val(start_date);
+            $('input[name="end_date"]').val(end_date);
+            $('#title').val(title);
+        }
+    });
 </script>
 @endsection
 

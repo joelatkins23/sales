@@ -4,6 +4,7 @@
 	<strong>Sale Status: </strong>
 	@if($sale_status==1){{'Completed'}}
 	@elseif($sale_status==2){{'Pending'}}
+	@elseif($sale_status==4){{'Incomplete'}}
 	@endif
 </p>
 <p>

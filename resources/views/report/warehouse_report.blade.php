@@ -106,8 +106,10 @@
                                     <td>{{number_format((float)($sale->grand_total - $sale->paid_amount), 2, '.', '')}}</td>
                                     @if($sale->sale_status == 1)
                                     <td><div class="badge badge-success">{{trans('file.Completed')}}</div></td>
-                                    @else
+                                    @elseif($sale->sale_status == 2)
                                     <td><div class="badge badge-danger">{{trans('file.Pending')}}</div></td>
+                                    @elseif($sale->sale_status == 4)
+                                    <td><div class="badge badge-danger">{{trans('file.Incomplete')}}</div></td>
                                     @endif
                                 </tr>
                                 @endforeach

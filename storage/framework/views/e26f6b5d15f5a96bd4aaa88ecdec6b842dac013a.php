@@ -161,6 +161,8 @@
                               <td><div class="badge badge-success"><?php echo e(trans('file.Completed')); ?></div></td>
                               <?php elseif($sale->sale_status == 2): ?>
                               <td><div class="badge badge-danger"><?php echo e(trans('file.Pending')); ?></div></td>
+                              <?php elseif($sale->sale_status == 4): ?>
+                              <td><div class="badge badge-danger"><?php echo e(trans('file.Incomplete')); ?></div></td>
                               <?php else: ?>
                               <td><div class="badge badge-warning"><?php echo e(trans('file.Draft')); ?></div></td>
                               <?php endif; ?>

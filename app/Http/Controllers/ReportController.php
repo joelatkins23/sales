@@ -25,6 +25,7 @@ use App\User;
 use App\Customer;
 use App\Supplier;
 use App\Variant;
+use App\Biller;
 use App\ProductVariant;
 use DB;
 use Auth;
@@ -588,6 +589,56 @@ class ReportController extends Controller
         return view('report.profit_loss', compact('purchase', 'total_purchase', 'sale', 'total_sale', 'return', 'purchase_return', 'total_return', 'total_purchase_return', 'expense', 'payroll', 'total_expense', 'total_payroll', 'payment_recieved', 'payment_recieved_number', 'cash_payment_sale', 'cheque_payment_sale', 'credit_card_payment_sale', 'gift_card_payment_sale', 'paypal_payment_sale', 'deposit_payment_sale', 'payment_sent', 'payment_sent_number', 'cash_payment_purchase', 'cheque_payment_purchase', 'credit_card_payment_purchase', 'warehouse_name', 'warehouse_sale', 'warehouse_purchase', 'warehouse_return', 'warehouse_purchase_return', 'warehouse_expense', 'start_date', 'end_date'));
     }
 
+    public function salesReport(Request $request)
+    {
+    	$data = $request->all();
+        $start_date = $data['start_date'];
+        $end_date = $data['end_date'];
+        $biller_id = $data['biller_id'];
+        if($biller_id == 0){
+            $sales_list=DB::table('sales')->select("sales.created_at", "sales.reference_no", "sales.total_price","sales.order_tax", "customers.name AS customer_name", "billers.name AS billers_name","sales.order_discount", "sales.shipping_cost", "sales.grand_total" )
+                        ->join('customers','sales.customer_id','=','customers.id','left')   
+                        ->join('billers','sales.biller_id','=','billers.id','left')     
+                        ->whereBetween('sales.created_at', [$start_date, $end_date])
+                        ->orderBy("created_at","desc")
+                        ->get();
+        }else{
+            $sales_list=DB::table('sales')->select("sales.created_at", "sales.reference_no", "sales.total_price","sales.order_tax", "customers.name AS customer_name", "billers.name AS billers_name","sales.order_discount", "sales.shipping_cost", "sales.grand_total" )
+                        ->join('customers','sales.customer_id','=','customers.id','left')   
+                        ->join('billers','sales.biller_id','=','billers.id','left')     
+                        ->whereBetween('sales.created_at', [$start_date, $end_date])
+                        ->where('sales.biller_id', $biller_id)
+                        ->orderBy("created_at","desc")
+                        ->get();
+        }
+        
+        $lims_biller_list = Biller::where('is_active', true)->get();
+        return view('report.sales_report',compact('sales_list','start_date', 'end_date', 'lims_biller_list','biller_id'));
+    }
+    public function purchasesReport(Request $request)
+    {
+    	$data = $request->all();
+        $start_date = $data['start_date'];
+        $end_date = $data['end_date'];
+        $supplier_id = $data['supplier_id'];
+        if($supplier_id == 0){
+            $purchases_list=DB::table('purchases')->select("purchases.created_at", "purchases.reference_no", "purchases.total_cost","purchases.order_tax", "suppliers.name AS supplier_name","purchases.order_discount", "purchases.shipping_cost", "purchases.grand_total" )
+                        ->join('suppliers','purchases.supplier_id','=','suppliers.id','left')     
+                        ->whereBetween('purchases.created_at', [$start_date, $end_date])
+                        ->orderBy("created_at","desc")
+                        ->get();
+        }else{
+            $purchases_list=DB::table('purchases')->select("purchases.created_at", "purchases.reference_no", "purchases.total_cost","purchases.order_tax", "suppliers.name AS supplier_name","purchases.order_discount", "purchases.shipping_cost", "purchases.grand_total" )
+                        ->join('suppliers','purchases.supplier_id','=','suppliers.id','left')     
+                        ->whereBetween('purchases.created_at', [$start_date, $end_date])
+                        ->where('purchases.supplier_id', $supplier_id)
+                        ->orderBy("created_at","desc")
+                        ->get();
+        }
+        $lims_supplier_list = Supplier::where('is_active', true)->get();
+        return view('report.purchases_report',compact('purchases_list','start_date', 'end_date', 'lims_supplier_list','supplier_id'));
+    }
+    
     public function productReport(Request $request)
     {
         $data = $request->all();
@@ -986,6 +1037,7 @@ class ReportController extends Controller
 
     public function supplierReport(Request $request)
     {
+        // lims_purchase_data
         $data = $request->all();
         $supplier_id = $data['supplier_id'];
         $start_date = $data['start_date'];
@@ -1016,6 +1068,7 @@ class ReportController extends Controller
             $lims_product_quotation_data[$key] = ProductQuotation::where('quotation_id', $quotation->id)->get();
         }
         $lims_supplier_list = Supplier::where('is_active', true)->get();
+        // print json_encode($lims_purchase_data);
         return view('report.supplier_report', compact('lims_purchase_data', 'lims_product_purchase_data', 'lims_payment_data', 'supplier_id', 'start_date', 'end_date', 'lims_supplier_list', 'lims_quotation_data', 'lims_product_quotation_data', 'lims_return_data', 'lims_product_return_data'));
     }
 

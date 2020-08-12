@@ -15,18 +15,6 @@
                         {!! Form::open(['route' => 'purchases.store', 'method' => 'post', 'files' => true, 'id' => 'purchase-form']) !!}
                         <div class="row">
                             <div class="col-md-12">
-                                <div class="row">                                   
-                                    <div class="offset-md-8 col-md-4">
-                                        <div class="form-group">
-                                            <label><strong>{{trans('file.Biller')}} *</strong></label>
-                                            <select required name="biller_id" class="selectpicker form-control" data-live-search="true" data-live-search-style="begins" title="Select Biller...">
-                                                @foreach($lims_biller_list as $biller)
-                                                <option value="{{$biller->id}}">{{$biller->name . ' (' . $biller->company_name . ')'}}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
                                 <div class="row">
                                     <div class="col-md-4">
                                         <div class="form-group">
@@ -164,7 +152,7 @@
                                 <div class="row mt-3">
                                     <div class="col-md-4">
                                         <div class="form-group">
-                                            <label><strong>{{trans('file.Order Tax')}}</strong></label>
+                                            <label><strong>IVA</strong></label>
                                             <select class="form-control" name="order_tax_rate">
                                                 <option value="0">{{trans('file.No Tax')}}</option>
                                                 @foreach($lims_tax_list as $tax)
@@ -194,7 +182,7 @@
                                     <div class="col-md-12">
                                         <div class="form-group">
                                             <label><strong>{{trans('file.Note')}}</strong></label>
-                                            <input type="text" class="form-control"  name="note">
+                                            <input type="text" class="form-control" name="note">
                                         </div>
                                     </div>
                                 </div>
@@ -217,7 +205,7 @@
             <td><strong>{{trans('file.Total')}}</strong>
                 <span class="pull-right" id="subtotal">0.00</span>
             </td>
-            <td><strong>{{trans('file.Order Tax')}}</strong>
+            <td><strong>IVA</strong>
                 <span class="pull-right" id="order_tax">0.00</span>
             </td>
             <td><strong>Retencion</strong>

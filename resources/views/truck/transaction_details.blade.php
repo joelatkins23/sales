@@ -7,15 +7,38 @@
         <div class="card">
             <div class="card-header mt-2">
                 <h3 class="text-center">{{trans('file.Transaction Details')}} [ {{$lims_truck_data->name}} ]</h3>
-            </div>    
+            </div>  
+            {!! Form::open(['route' => 'trucks.datetransactiondetails', 'method' => 'post']) !!}
+            <div class="row">
+                <div class="col-md-4 offset-md-3 mt-3">
+                    <div class="form-group row">
+                        <label class="d-tc mt-2"><strong>{{trans('file.Choose Your Date')}}</strong> &nbsp;</label>
+                        <div class="d-tc">
+                            <div class="input-group">
+                                <input type="text" class="daterangepicker-field form-control" value="{{$start_date}} To {{$end_date}}" id="title_date" required />
+                                <input type="hidden" name="start_date" id="sstart" value="{{$start_date}}" />
+                                <input type="hidden" name="end_date" id="estart" value="{{$end_date}}" />
+                                <input type="hidden" name="id" id="id" value="{{$id}}" />
+                            </div>
+                        </div>
+                    </div>
+                </div>               
+                <div class="col-md-2 mt-3">
+                    <div class="form-group">
+                        <button class="btn btn-primary" type="submit">{{trans('file.submit')}}</button>
+                    </div>
+                </div>
+            </div>
+            {!! Form::close() !!}                
             <div class="table-responsive mb-4">
                 <table id="transation-table" class="table table-hover">
                     <thead>
                         <tr>
                             <th class="not-exported-transaction"></th>
-                            <th>{{trans('file.Delivery')}} {{trans('file.reference')}}</th>
+                            <th>{{trans('file.Create')}} {{trans('file.Date')}}</th>
                             <th>{{trans('file.Sale')}} {{trans('file.reference')}}</th>
-                            <th>{{trans('file.product')}} ({{trans('file.qty')}})</th>
+                            <th>Customer Info</th>
+                            <th>Sale status</th>
                             <th>{{trans('file.grand total')}}</th>
                             <th>{{trans('file.Paid')}}</th>
                             <th>{{trans('file.Due')}}</th>
@@ -25,30 +48,41 @@
                     <tbody>
                         @foreach($lims_truck_data->delivery as $key=>$delivery)
                         <?php
-                            $lims_product_sale_data = App\Product_Sale::where('sale_id', $delivery->sale->id)->get();
+                            // $lims_product_sale_data = App\Product_Sale::where('sale_id', $delivery->sale->id)->get();
+                            $total_address = $delivery->address;
+                            $result_customer = App\Customer::find($delivery->sale->customer_id);
+                        
+                            $create_date = explode(" ", $delivery->created_at)[0];
+                            $customer_info='';
+                             
+                            $customer_info = $result_customer->name;
+                            if($result_customer->zone)
+                                $customer_info .= ' ['.$result_customer->zone.']';
+                            if($result_customer->company_name)
+                                $customer_info .= ' ['.$result_customer->company_name.']';  
+                                // $sale_status= $delivery->sale_id;
+                            $sales = App\Sale::find($delivery->sale_id);
+                           
                         ?>
+                            
+                        
                         <tr >
-                            @if($delivery->status < 3)
+                            @if($delivery->status)
                             <td>{{$key}}</td>
-                            <td>{{$delivery->reference_no}}</td>
+                            <td>{{$create_date}}</td>
                             <td>{{$delivery->sale->reference_no}}</td>
+                            
                             <td>
-                                @foreach($lims_product_sale_data as $product_sale_data)
-                                <?php 
-                                    $product = App\Product::select('name')->find($product_sale_data->product_id);
-                                    if($product_sale_data->variant_id) {
-                                        $variant = App\Variant::find($product_sale_data->variant_id);
-                                        $product->name .= ' ['.$variant->name.']'; 
-                                    }
-                                    $unit = App\Unit::find($product_sale_data->sale_unit_id);
-                                ?>
-                                @if($unit)
-                                    {{$product->name.' ('.$product_sale_data->qty.' '.$unit->unit_code.')'}}
-                                @else
-                                    {{$product->name.' ('.$product_sale_data->qty.')'}}
+                                {{ $customer_info}}
+                            </td>
+                            <td>
+                                @if($sales->sale_status == 1)
+                                <div class="badge badge-success">{{trans('file.Completed')}}</div>
+                                @elseif($sales->sale_status == 2)
+                                <div class="badge badge-danger">{{trans('file.Pending')}}</div>
+                                @elseif($sales->sale_status == 4)
+                                <div class="badge badge-warning">{{trans('file.Incomplete')}}</div>
                                 @endif
-                                <br>
-                                @endforeach
                             </td>
                             <td>{{$delivery->sale->grand_total}}</td>
                             <td>{{$delivery->sale->paid_amount}}</td>
@@ -195,6 +229,7 @@
                         <select id="sale_status" name="sale_status" class="form-control">
                         <option value="1">{{trans('file.Completed')}}</option>
                         <option value="2">{{trans('file.Pending')}}</option>
+                        <option value="4">{{trans('file.Incomplete')}}</option>
                     </select>
                 </div>
                 <input type="hidden" name="sale_id">
@@ -220,6 +255,7 @@
                     <div class="col-md-6 form-group">
                         <label><strong>{{trans('file.Delivery Reference')}}</strong></label>
                         <p id="dr"></p>
+                        <label><strong>{{trans('file.Date')}}</strong><input type="text" data-date-format='yyyy-mm-dd' id="datepicker" name="create_date" class="form-control"></label>
                     </div>
                     <div class="col-md-6 form-group">
                         <label><strong>{{trans('file.Sale Reference')}}</strong></label>
@@ -230,6 +266,7 @@
                         <select name="status" required class="form-control selectpicker">
                             <option value="2">{{trans('file.Delivering')}}</option>
                             <option value="3">{{trans('file.Delivered')}}</option>
+                            <option value="4">{{trans('file.Collect')}}</option>
                         </select>
                     </div>
                     <div class="col-md-6 form-group">
@@ -276,7 +313,9 @@
 </section>
 
 <script type="text/javascript">
-
+    $('#datepicker').datepicker({
+      dateFormat: 'yyyy-mm-dd'
+    });
     $('#transation-table').DataTable( {
         "order": [],
         'columnDefs': [
@@ -297,6 +336,7 @@
         buttons: [
             {
                 extend: 'pdf',
+                title: $('.text-center').text(),
                 exportOptions: {
                     columns: ':visible:Not(.not-exported-transaction)',
                     rows: ':visible'
@@ -363,14 +403,14 @@
     function datatable_sum_sale(dt_selector, is_calling_first) {
         if (dt_selector.rows( '.selected' ).any() && is_calling_first) {
             var rows = dt_selector.rows( '.selected' ).indexes();
-            $( dt_selector.column( 4 ).footer() ).html(dt_selector.cells( rows, 4, { page: 'current' } ).data().sum().toFixed(2));
             $( dt_selector.column( 5 ).footer() ).html(dt_selector.cells( rows, 5, { page: 'current' } ).data().sum().toFixed(2));
             $( dt_selector.column( 6 ).footer() ).html(dt_selector.cells( rows, 6, { page: 'current' } ).data().sum().toFixed(2));
+            $( dt_selector.column( 7 ).footer() ).html(dt_selector.cells( rows, 7, { page: 'current' } ).data().sum().toFixed(2));
         }
         else {            
-            $( dt_selector.column( 4 ).footer() ).html(dt_selector.column( 4, {page:'current'} ).data().sum().toFixed(2));
             $( dt_selector.column( 5 ).footer() ).html(dt_selector.column( 5, {page:'current'} ).data().sum().toFixed(2));
-            $( dt_selector.column( 6 ).footer() ).html(dt_selector.cells( rows, 6, { page: 'current' } ).data().sum().toFixed(2));
+            $( dt_selector.column( 6 ).footer() ).html(dt_selector.column( 6, {page:'current'} ).data().sum().toFixed(2));
+            $( dt_selector.column( 7 ).footer() ).html(dt_selector.cells( rows, 7, { page: 'current' } ).data().sum().toFixed(2));
         }
     }
     $(document).on("click", "table#transation-table tbody .add-payment", function(event) {
@@ -382,7 +422,7 @@
         rowindex = $(this).closest('tr').index();
         deposit = $('table#transation-table tbody tr:nth-child(' + (rowindex + 1) + ')').find('.deposit').val();
         var sale_id = $(this).data('id').toString();
-        var balance = $('table#transation-table tbody tr:nth-child(' + (rowindex + 1) + ')').find('td:nth-child(7)').text();
+        var balance = $('table#transation-table tbody tr:nth-child(' + (rowindex + 1) + ')').find('td:nth-child(8)').text();
         balance = parseFloat(balance.replace(/,/g, ''));
         $('input[name="paying_amount"]').val(balance);
         $('#add-payment input[name="balance"]').val(balance);
@@ -490,6 +530,20 @@
             $("#sale-status").modal('show');
         });
             
+    });
+    var prev_date = new Date();
+    prev_date.setDate(prev_date.getDate() + 30000);  
+    $(".daterangepicker-field").daterangepicker({
+        maxDate: prev_date,
+    callback: function(startDate, endDate, period){
+        var start_date = startDate.format('YYYY-MM-DD');
+        var end_date = endDate.format('YYYY-MM-DD');
+        var title = start_date + ' To ' + end_date;
+        $(".daterangepicker-field").val(title);
+        $('input[name="start_date"]').val(start_date);
+        $('input[name="end_date"]').val(end_date);
+        $('#title').val(title);
+    }
     });
 </script>
 @endsection

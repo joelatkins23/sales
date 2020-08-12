@@ -20,7 +20,6 @@ class AdjustmentController extends Controller
     {
         $role = Role::find(Auth::user()->role_id);
         if( $role->hasPermissionTo('adjustment') ) {
-            $general_setting = DB::table('general_settings')->latest()->first();
             if(Auth::user()->role_id > 2 && $general_setting->staff_access == 'own')
                 $lims_adjustment_all = Adjustment::orderBy('id', 'desc')->where('user_id', Auth::id())->get();
             else

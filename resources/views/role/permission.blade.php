@@ -667,6 +667,26 @@
 						                    </div>
 						                    <label for="best-seller" class="padding05">{{trans('file.Best Seller')}} &nbsp;&nbsp;</label>
 						                </span>
+										<span style="display:inline-block;">
+						                    <div class="text-center" aria-checked="false" aria-disabled="false">
+					                    	@if(in_array("sales-report", $all_permission))
+					                    	<input type="checkbox" value="1" class="checkbox" name="sales-report" checked>
+					                    	@else
+					                    	<input type="checkbox" value="1" class="checkbox" name="sales-report">
+					                    	@endif
+						                    </div>
+						                    <label for="sales-report" class="padding05">{{trans('file.Sales Report')}} &nbsp;&nbsp;</label>
+						                </span>
+										<span style="display:inline-block;">
+						                    <div class="text-center" aria-checked="false" aria-disabled="false">
+					                    	@if(in_array("purchases-report", $all_permission))
+					                    	<input type="checkbox" value="1" class="checkbox" name="purchases-report" checked>
+					                    	@else
+					                    	<input type="checkbox" value="1" class="checkbox" name="purchases-report">
+					                    	@endif
+						                    </div>
+						                    <label for="purchases-report" class="padding05">{{trans('file.Purchases Report')}} &nbsp;&nbsp;</label>
+						                </span>
 						                <span style="display:inline-block;">
 						                    <div class="text-center" aria-checked="false" aria-disabled="false">
 					                    	@if(in_array("daily-sale", $all_permission))

@@ -9,6 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="all,follow">
 
+
     <style type="text/css">
         * {
             font-size: 14px;
@@ -17,7 +18,7 @@
             text-transform: capitalize;
         }
         .btn {
-            padding: 7px 10px;
+            padding: 2px 2px;
             text-decoration: none;
             border: none;
             display: block;
@@ -43,7 +44,7 @@
             border-collapse: collapse;
         }
         tr {border-bottom: 1px dotted #ddd;}
-        td,th {padding: 7px 0;width: 50%;}
+        td,th {padding: 1px 0;width: 50%;}
 
         table {width: 100%;}
         tfoot tr th:first-child {text-align: left;}
@@ -56,10 +57,10 @@
 
         @media print {
             * {
-                font-size:12px;
+                font-size:14px;
                 line-height: 20px;
             }
-            td,th {padding: 5px 0;}
+            td,th {padding: 1px 0;}
             .hidden-print {
                 display: none !important;
             }
@@ -68,7 +69,7 @@
     </style>
   </head>
 <body>
-
+<?php setlocale(LC_ALL,"es_ES"); ?>
 <div style="max-width:1200px;margin:0 auto">
     @if(preg_match('~[0-9]~', url()->previous()))
         @php $url = '../../pos'; @endphp
@@ -89,27 +90,58 @@
             <tbody>
                 <tr>
                     <td class="border-0 pl-0" width="70%">
-                            <p><strong>{{$lims_biller_data->company_name}}
-                            <br>NIT: {{$lims_biller_data->vat_number}}</strong>
-                            <br><strong>DIRECCION: </strong>{{$lims_warehouse_data->address}}
-                            <br><strong>TELEFONO: </strong>{{$lims_warehouse_data->phone}}</p>
+                        @if($lims_biller_data->company_name == 'PRODECON')
+                        <img src="{{url('public/logo/CERT PRODECON.jpg')}}" height="135" width="240" style="margin:1px 0;filter: brightness(1);">
+                        <p><strong>PRODECON
+                        <br>COMERCIALIZADORA DE PRODUCTOS
+                        <br>NIT: {{$lims_biller_data->vat_number}}</strong>
+                        </p>
+                        @endif
+                        @if($lims_biller_data->company_name == 'DEMACOL')
+                        <img src="{{url('public/logo/DEMACOL.jpg')}}" height="135" width="240" style="margin:1px 0;filter: brightness(1);">
+                        <p><strong>DEMACOL
+                        <br>DISTRIBUIDORA DE MATERIALES
+                        <br>NIT: {{$lims_biller_data->vat_number}}</strong>
+                        </p>
+                        @endif
+                            
                     </td>
                     <td class="border-0 pl-0">
-                        @if($lims_biller_data->company_name == 'PRODECON - COMERCIALIZADORA PRODECON')
-                        <img src="{{url('public/logo/CERT PRODECON.jpg')}}" height="135" width="240" style="float:right;margin:1px 0;filter: brightness(1);">
-                        @endif
-                        @if($lims_biller_data->company_name == 'DEMACOL - COMERCIALIZADORA DE MATERIALES DE COLOMBIA')
-                        <img src="{{url('public/logo/DEMACOL.jpg')}}" height="135" width="240" style="float:right;margin:1px 0;filter: brightness(1);">
-                        @endif
-                        <p><strong>FECHA: {{$lims_sale_data->created_at}}</strong>
+                        <?php 
+                        $spanish_months = array(
+                                    'January' => 'enero',
+                                    'February' => 'febrero',
+                                    'March' => 'marzo',
+                                    'April' => 'abril',
+                                    'May' => 'mayo',
+                                    'June' => 'junio',
+                                    'July' => 'julio',
+                                    'August' => 'agosto',
+                                    'September' => 'septiembre',
+                                    'October' => 'octubre',
+                                    'November' => 'noviembre',
+                                    'December' => 'diciembre'
+                                );
+                        $month=date_format(date_create($lims_sale_data->created_at),'F');
+                        $day=date_format(date_create($lims_sale_data->created_at),'d');
+                        $sp_month=$spanish_months[$month];
+                        $lims_dato=date_format(date_create($lims_sale_data->created_at),'Y-F-d');
+                        $lims_data=date_format(date_create($lims_sale_data->created_at),'Y-F-d H:i:s');
+                        $lims_data=str_replace($month, $sp_month, $lims_data);
+ ?>
+                        <p>
                         @if($lims_sale_data->reference_no > 1)
-                        <br><strong>REFERENCIA: COTIZACION-{{$lims_sale_data->reference_no}}</strong>
+                        <strong style="font-size:20px;">FECHA: {{ $lims_data }}</strong>
+                        <br><strong style="font-size:20px;">COTIZACION-{{$lims_sale_data->reference_no}}</strong>
                         @else
-                        <br><strong>REFERENCIA: {{$lims_sale_data->reference_no}}</strong>
+                        <strong style="font-size:20px;">FECHA: {{ $lims_data }}</strong>
+                        <br><strong style="font-size:20px;">{{$lims_sale_data->reference_no}}</strong>
                         @endif
-                        <br><strong>CLIENTE: </strong>{{$lims_customer_data->name}}, {{$lims_customer_data->company_name}}
+                        <br><strong style="font-size:20px;">RAZON SOCIAL: {{$lims_customer_data->company_name}}</strong>
+                        <br><strong>CLIENTE: </strong>{{$lims_customer_data->name}}
                         <br><strong>NIT: </strong>{{$lims_customer_data->tax_no}}
-                        <br><strong>DIRECCION: </strong>{{$lims_customer_data->address}}, {{$lims_customer_data->zone}}
+                        <br><strong>DIRECCION: </strong>{{$lims_customer_data->address}}
+                        <br><strong>ZONA: </strong>{{$lims_customer_data->zone}}
                         <br><strong>TELEFONO: </strong>{{$lims_customer_data->phone_number}}</p>
                     </td>
                 </tr>
@@ -168,7 +200,7 @@
                 @endif
                 @if($lims_sale_data->shipping_cost)
                 <tr style="border-bottom:1px dotted">
-                    <th colspan="3">ICA</th>
+                    <th colspan="3">RETEICA</th>
                     <th style="text-align:right">{{number_format((float)$lims_sale_data->shipping_cost, 2, '.', ',')}}</th>
                 </tr>
                 @endif
@@ -193,8 +225,17 @@
                     <td style="padding: 5px;width:40%"><strong>Cantidad pagada: {{number_format((float)$payment_data->amount, 2, '.', ',')}}</strong></td>
                     <td style="padding: 5px;width:30%">{{trans('file.Change')}}: {{number_format((float)$payment_data->change, 2, '.', ',')}}</td>
                 </tr>
-                <tr><td class="centered" colspan="3"><strong>GRACIAS POR FREFERIRNOS {{$lims_biller_data->company_name}} SIEMPRE CONTIGO</strong></td></tr>
                 @endforeach
+                <tr><td class="left" colspan="3"><strong style="font-size:18px;">{{$lims_sale_data->sale_note}}</strong></td></tr>
+                <tr><td class="left" colspan="3"><strong style="font-size:18px;">Firma recibido:___________________________________</strong></td></tr>
+                @if($lims_biller_data->company_name == 'PRODECON')
+                <tr><td class="centered" colspan="3"><strong>CR 86F No 51B-40 SUR BARRIO BETANIA, BOGOTA DC  TELEFONOS: 3136284216 - 3209990744 - 7231772</strong></td></tr>
+                <tr><td class="centered" colspan="3"><strong>GRACIAS POR PREFERIRNOS PRODECON SIEMPRE CONTIGO</strong></td></tr>
+                @endif
+                @if($lims_biller_data->company_name == 'DEMACOL')
+                <tr><td class="centered" colspan="3"><strong>CR 86F No 51B-40 SUR BARRIO BETANIA, BOGOTA DC  TELEFONOS: 3136284216 - 3209990744 - 7231772</strong></td></tr>
+                <tr><td class="centered" colspan="3"><strong>GRACIAS POR PREFERIRNOS DEMACOL SIEMPRE CONTIGO</strong></td></tr>
+                @endif
             </tbody>
         </table>
     <div id="receipt-data">

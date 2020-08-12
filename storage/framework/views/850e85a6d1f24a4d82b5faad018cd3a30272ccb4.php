@@ -40,17 +40,16 @@
                                 <span class="sr-only">Toggle Dropdown</span>
                             </button>
                             <ul class="dropdown-menu edit-options dropdown-menu-right dropdown-default" user="menu">
-                                <li><button type="button" data-id="<?php echo e($truck->id); ?>" data-name="<?php echo e($truck->name); ?>" data-model="<?php echo e($truck->model); ?>" data-identification="<?php echo e($truck->identification); ?>" data-driver_name="<?php echo e($truck->driver_name); ?>" data-capacity="<?php echo e($truck->capacity); ?>" data-unit_id="<?php echo e($truck->unit->id); ?>" class="edit-btn btn btn-link" data-toggle="modal" data-target="#truck-edit-modal"><i class="fa fa-edit"></i> <?php echo e(trans('file.edit')); ?></button></li>
+                                <!--<li><button type="button" data-id="<?php echo e($truck->id); ?>" data-name="<?php echo e($truck->name); ?>" data-model="<?php echo e($truck->model); ?>" data-identification="<?php echo e($truck->identification); ?>" data-driver_name="<?php echo e($truck->driver_name); ?>" data-capacity="<?php echo e($truck->capacity); ?>" data-unit_id="<?php echo e($truck->unit->id); ?>" class="edit-btn btn btn-link" data-toggle="modal" data-target="#truck-edit-modal"><i class="fa fa-edit"></i> <?php echo e(trans('file.edit')); ?></button></li>-->
                                 <li><a href="<?php echo e(route('trucks.transactionDetails', $truck->id)); ?>" class="btn btn-link"><i class="ion-ios-paper-outline"></i> Listado</a></li>
                                 <li><a href="<?php echo e(route('trucks.daytransactionDetails', $truck->id)); ?>" class="btn btn-link"><i class="ion-ios-paper-outline"></i> List(Day)</a></li>
-                                <li class="divider"></li>
+                                <!--<li class="divider"></li>
                                 <?php echo e(Form::open(['route' => ['trucks.destroy', $truck->id], 'method' => 'DELETE'] )); ?>
 
                                 <li>
                                     <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="fa fa-trash"></i> <?php echo e(trans('file.delete')); ?></button>
                                 </li>
-                                <?php echo e(Form::close()); ?>
-
+                                <?php echo e(Form::close()); ?>-->
                             </ul>
                         </div>
                     </td>

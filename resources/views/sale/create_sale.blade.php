@@ -67,7 +67,7 @@
                                         <input type="hidden" name="customer_id_hidden" value="{{$lims_sale_data->customer_id}}">
                                         @endif
                                         <div class="input-group pos">
-                                            <select required name="customer_id" id="customer_id" class="selectpicker form-control" data-live-search="true" data-live-search-style="begins" title="Select customer...">
+                                            <select required name="customer_id" id="customer_id" class="selectpicker js-example-placeholder-single js-states form-control" data-live-search="true" title="Select customer...">
                                             @foreach($lims_customer_list as $customer)
                                                 @php $deposit[$customer->id] = $customer->deposit - $customer->expense; @endphp
                                                 <option value="{{$customer->id}}">{{$customer->name . ' (' . $customer->phone_number . ')'}}</option>
@@ -662,7 +662,9 @@
 </section>
 
 <script type="text/javascript">
-
+$("#customer_id").select2({
+        allowClear: true
+    });
     $("ul#sale").siblings('a').attr('aria-expanded','true');
     $("ul#sale").addClass("show");
     $("ul#sale li").eq(1).addClass("active");

@@ -8,10 +8,72 @@
 
 <section>
     <div class="container-fluid">
-        <?php if(in_array("sales-add", $all_permission)): ?>
-            <a href="<?php echo e(route('sales.create')); ?>" class="btn btn-info"><i class="fa fa-plus"></i> <?php echo e(trans('file.Add Sale')); ?></a>&nbsp;
-            <a href="<?php echo e(url('sales/sale_by_csv')); ?>" class="btn btn-primary"><i class="fa fa-file"></i> <?php echo e(trans('file.Import Sale')); ?></a>
-        <?php endif; ?>
+        <div class="row">
+            <div class="col-md-4">
+                <?php if(in_array("sales-add", $all_permission)): ?>
+                    <a href="<?php echo e(route('sales.create')); ?>" class="btn btn-info"><i class="fa fa-plus"></i> <?php echo e(trans('file.Add Sale')); ?></a>&nbsp;
+                    <a href="<?php echo e(url('sales/sale_by_csv')); ?>" class="btn btn-primary"><i class="fa fa-file"></i> <?php echo e(trans('file.Import Sale')); ?></a>
+                <?php endif; ?>
+            </div>            
+        </div> 
+        <?php echo Form::open(['route' => 'sale.satus_list', 'method' => 'post']); ?>
+
+                <div class="row mt-3">
+                    <div class="offset-md-1 col-md-4">
+                        <div class="form-group row">
+                            <label class="d-tc mt-2"><strong><?php echo e(trans('file.Choose Your Date')); ?></strong> &nbsp;</label>
+                            <div class="d-tc">
+                                <div class="input-group">
+                                    <input type="text" class="daterangepicker-field form-control"  value="<?php echo e($start_date); ?> To <?php echo e($end_date); ?>" id="title_date" required />
+                                    <input type="hidden" name="start_date" id="sstart" value="<?php echo e($start_date); ?>" />
+                                    <input type="hidden" name="end_date" id="estart" value="<?php echo e($end_date); ?>" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>                    
+                    <div class="col-md-2">
+                        <div class="form-group row">
+                            <select name="sale_status" class="form-control">
+                                <option value="">select status</option>
+                                <option 
+                                    <?php if($status==1): ?>
+                                    <?php echo e("selected"); ?>
+
+                                    <?php endif; ?>
+                                value="1"><?php echo e(trans('file.Completed')); ?></option>
+                                <option 
+                                <?php if($status==2): ?>
+                                    <?php echo e("selected"); ?>
+
+                                    <?php endif; ?>
+                                value="2"><?php echo e(trans('file.Pending')); ?></option>
+                                <option
+                                <?php if($status==4): ?>
+                                    <?php echo e("selected"); ?>
+
+                                    <?php endif; ?>
+                                value="4"><?php echo e(trans('file.Incomplete')); ?></option>
+                                </select>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group row">                           
+                            <select name="client_id" id="" class="form-control select2">
+                                <option value="">select Client</option>
+                                    <?php $__currentLoopData = $client_list; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key=>$client): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <option value="<?php echo e($client->zone); ?>"><?php echo e($client->zone); ?></option>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                            </select>
+                            
+                        </div>
+                    </div>                    
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <button class="btn btn-primary" type="submit"><?php echo e(trans('file.submit')); ?></button>
+                        </div>
+                    </div>
+                </div>               
+                <?php echo Form::close(); ?>             
     </div>
     <div class="table-responsive">
         <table id="sale-table" class="table table-striped sale-list" style="width: 100%">
@@ -19,12 +81,14 @@
                 <tr>
                     <th class="not-exported"></th>
                     <th><?php echo e(trans('file.Delivery Status')); ?></th>
+                    <th><?php echo e(trans('file.Trucks')); ?></th>
                     <th><?php echo e(trans('file.Date')); ?></th>                    
                     <th><?php echo e(trans('file.reference')); ?></th>
                     <th><?php echo e(trans('file.Biller')); ?></th>
                     <th><?php echo e(trans('file.customer')); ?></th>
                     <th><?php echo e(trans('file.Sale Status')); ?></th>
                     <th><?php echo e(trans('file.Payment Status')); ?></th>
+                    <th>Total Weight</th>
                     <th><?php echo e(trans('file.grand total')); ?></th>
                     <th><?php echo e(trans('file.Paid')); ?></th>
                     <th><?php echo e(trans('file.Due')); ?></th>
@@ -36,6 +100,8 @@
                 <th></th>
                 <th></th>
                 <th><?php echo e(trans('file.Total')); ?></th>
+                <th></th>
+                <th></th>
                 <th></th>
                 <th></th>
                 <th></th>
@@ -86,7 +152,7 @@
                     <th><?php echo e(trans('file.Qty')); ?></th>
                     <th><?php echo e(trans('file.Unit Price')); ?></th>
                     <th><?php echo e(trans('file.Tax')); ?></th>
-                    <th><?php echo e(trans('file.Discount')); ?></th>
+                    <th>Total Weight</th>
                     <th><?php echo e(trans('file.Subtotal')); ?></th>
                 </thead>
                 <tbody>
@@ -305,20 +371,15 @@
                     $lims_truck_list = \App\Truck::all();
                 ?>
                 <div class="row">
-                    
                     <div class="col-md-6 form-group">
                         <label><strong><?php echo e(trans('file.Delivery Reference')); ?></strong></label>
                         <p id="dr"></p>
+                        <label><strong><?php echo e(trans('file.Date')); ?></strong><input type="text" data-date-format='yyyy-mm-dd' id="datepicker" name="create_date" class="form-control"></label>
+
                     </div>
                     <div class="col-md-6 form-group">
                         <label><strong><?php echo e(trans('file.Sale Reference')); ?></strong></label>
                         <p id="sr"></p>
-                    </div>
-                    <div class="col-md-6 form-group">
-                        <label><strong><?php echo e(trans('file.Delivery')); ?> <?php echo e(trans('file.Date')); ?></strong></label>
-                        <input type="date" name="delivery_date" class="form-control" value="<?php echo e(date('Y-m-d')); ?>" placeholder="dd-mm-yyyy">
-                    </div>
-                    <div class="col-md-6 form-group">                       
                     </div>
                     <div class="col-md-6 form-group">
                         <label><strong><?php echo e(trans('file.Status')); ?> *</strong></label>
@@ -326,6 +387,7 @@
                             <option value="1"><?php echo e(trans('file.Packing')); ?></option>
                             <option value="2"><?php echo e(trans('file.Delivering')); ?></option>
                             <option value="3"><?php echo e(trans('file.Delivered')); ?></option>
+                            <option value="4"><?php echo e(trans('file.Collect')); ?></option>
                         </select>
                     </div>
                     <div class="col-md-6 form-group">
@@ -372,7 +434,12 @@
 </div>
 
 <script type="text/javascript">
-
+    // $( function() {
+    //     $( "#datepicker" ).datepicker();
+    //   } );
+    $('#datepicker').datepicker({
+      dateFormat: 'yyyy-mm-dd'
+    });
     $("ul#sale").siblings('a').attr('aria-expanded','true');
     $("ul#sale").addClass("show");
     $("ul#sale #sale-list-menu").addClass("active");
@@ -432,7 +499,7 @@
         rowindex = $(this).closest('tr').index();
         deposit = $('table.sale-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('.deposit').val();
         var sale_id = $(this).data('id').toString();
-        var balance = $('table.sale-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('td:nth-child(11)').text();
+        var balance = $('table.sale-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('td:nth-child(13)').text();
         balance = parseFloat(balance.replace(/,/g, ''));
         $('input[name="paying_amount"]').val(balance);
         $('#add-payment input[name="balance"]').val(balance);
@@ -701,12 +768,14 @@
         "columns": [
             {"data": "key"},
             {"data": "delivery_status"},
+            {"data": "trucks_name"},            
             {"data": "date"},
             {"data": "reference_no"},
             {"data": "biller"},
             {"data": "customer"},
             {"data": "sale_status"},
             {"data": "payment_status"},
+            {"data": "total_weight"},
             {"data": "grand_total"},
             {"data": "paid_amount"},
             {"data": "due"},
@@ -722,11 +791,11 @@
                     'next': '<?php echo e(trans("file.Next")); ?>'
             }
         },
-        order:[['1', 'desc']],
+        order:[['2', 'desc']],
         'columnDefs': [
             {
                 "orderable": false,
-                'targets': [0, 3, 4, 5, 6, 9, 10]
+                'targets': [0, 1, 4, 5, 11, 12]
             },
             {
                 'checkboxes': {
@@ -828,15 +897,16 @@
     function datatable_sum(dt_selector, is_calling_first) {
         if (dt_selector.rows( '.selected' ).any() && is_calling_first) {
             var rows = dt_selector.rows( '.selected' ).indexes();
-
-            $( dt_selector.column( 8 ).footer() ).html(dt_selector.cells( rows, 8, { page: 'current' } ).data().sum().toFixed(2));
             $( dt_selector.column( 9 ).footer() ).html(dt_selector.cells( rows, 9, { page: 'current' } ).data().sum().toFixed(2));
             $( dt_selector.column( 10 ).footer() ).html(dt_selector.cells( rows, 10, { page: 'current' } ).data().sum().toFixed(2));
+            $( dt_selector.column( 11 ).footer() ).html(dt_selector.cells( rows, 11, { page: 'current' } ).data().sum().toFixed(2));
+            $( dt_selector.column( 12).footer() ).html(dt_selector.cells( rows, 12, { page: 'current' } ).data().sum().toFixed(2));
         }
         else {
-            $( dt_selector.column( 8 ).footer() ).html(dt_selector.cells( rows, 8, { page: 'current' } ).data().sum().toFixed(2));
             $( dt_selector.column( 9 ).footer() ).html(dt_selector.cells( rows, 9, { page: 'current' } ).data().sum().toFixed(2));
             $( dt_selector.column( 10 ).footer() ).html(dt_selector.cells( rows, 10, { page: 'current' } ).data().sum().toFixed(2));
+            $( dt_selector.column( 11 ).footer() ).html(dt_selector.cells( rows, 11, { page: 'current' } ).data().sum().toFixed(2));
+            $( dt_selector.column( 12 ).footer() ).html(dt_selector.cells( rows, 12, { page: 'current' } ).data().sum().toFixed(2));
         }
     }
 
@@ -845,6 +915,7 @@
 
         var htmltext = '<strong><?php echo e(trans("file.Date")); ?>: </strong>'+sale[0]+'<br><strong><?php echo e(trans("file.reference")); ?>: </strong>'+sale[1]+'<br><strong><?php echo e(trans("file.Warehouse")); ?>: </strong>'+sale[27]+'<br><strong><?php echo e(trans("file.Sale Status")); ?>: </strong>'+sale[2]+'<br><br><div class="row"><div class="col-md-6"><strong><?php echo e(trans("file.From")); ?>:</strong><br>'+sale[3]+'<br>'+sale[4]+'<br>'+sale[5]+'<br>'+sale[6]+'<br>'+sale[7]+'<br>'+sale[8]+'</div><div class="col-md-6"><div class="float-right"><strong><?php echo e(trans("file.To")); ?>:</strong><br>'+sale[9]+'<br>'+sale[10]+'<br>'+sale[11]+'<br>'+sale[12]+'</div></div></div>';
         $.get('sales/product_sale/' + sale[13], function(data){
+            console.log(data);
             $(".product-sale-list tbody").remove();
             var name_code = data[0];
             var qty = data[1];
@@ -862,7 +933,7 @@
                 cols += '<td>' + qty[index] + ' ' + unit_code[index] + '</td>';
                 cols += '<td>' + parseFloat(subtotal[index] / qty[index]).toFixed(2) + '</td>';
                 cols += '<td>' + tax[index] + '(' + tax_rate[index] + '%)' + '</td>';
-                cols += '<td>' + discount[index] + '</td>';
+                cols += '<td>' + parseFloat(discount[index]*qty[index]).toFixed(2) + '</td>';
                 cols += '<td>' + subtotal[index] + '</td>';
                 newRow.append(cols);
                 newBody.append(newRow);
@@ -968,7 +1039,20 @@
         }
         return false;
     }
-
+    var prev_date = new Date();
+        prev_date.setDate(prev_date.getDate() + 30000);  
+        $(".daterangepicker-field").daterangepicker({
+            maxDate: prev_date,
+        callback: function(startDate, endDate, period){
+            var start_date = startDate.format('YYYY-MM-DD');
+            var end_date = endDate.format('YYYY-MM-DD');
+            var title = start_date + ' To ' + end_date;
+            $(".daterangepicker-field").val(title);
+            $('input[name="start_date"]').val(start_date);
+            $('input[name="end_date"]').val(end_date);
+            $('#title').val(title);
+        }
+    });
 </script>
 <?php $__env->stopSection(); ?>
 

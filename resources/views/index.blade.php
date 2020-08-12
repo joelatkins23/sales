@@ -162,6 +162,8 @@
                               <td><div class="badge badge-success">{{trans('file.Completed')}}</div></td>
                               @elseif($sale->sale_status == 2)
                               <td><div class="badge badge-danger">{{trans('file.Pending')}}</div></td>
+                              @elseif($sale->sale_status == 4)
+                              <td><div class="badge badge-danger">{{trans('file.Incomplete')}}</div></td>
                               @else
                               <td><div class="badge badge-warning">{{trans('file.Draft')}}</div></td>
                               @endif

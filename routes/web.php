@@ -90,6 +90,7 @@ Route::group(['middleware' => ['auth', 'active']], function() {
 	Route::resource('biller', 'BillerController');
 
 	Route::post('sales/sale-data', 'SaleController@saleData');
+	Route::post('sales/sale-status-data', 'SaleController@saleStatusData')->name('sale.sale-status-data');
 	Route::post('sales/sendmail', 'SaleController@sendMail')->name('sale.sendmail');
 	Route::get('sales/sale_by_csv', 'SaleController@saleByCsv');
 	Route::get('sales/product_sale/{id}','SaleController@productSaleData');
@@ -109,6 +110,7 @@ Route::group(['middleware' => ['auth', 'active']], function() {
 	Route::get('sales/getpayment/{id}', 'SaleController@getPayment')->name('sale.get-payment');
 	Route::post('sales/updatepayment', 'SaleController@updatePayment')->name('sale.update-payment');
 	Route::post('sales/deletepayment', 'SaleController@deletePayment')->name('sale.delete-payment');
+	Route::post('sales/satus_list', 'SaleController@satus_list')->name('sale.satus_list');
 	Route::get('sales/{id}/create', 'SaleController@createSale');
 	Route::post('sales/deletebyselection', 'SaleController@deleteBySelection');
 	Route::get('sales/get-due-amount/{customer_id}', 'SaleController@getDueAmount');
@@ -117,6 +119,9 @@ Route::group(['middleware' => ['auth', 'active']], function() {
 	Route::get('delivery', 'DeliveryController@index')->name('delivery.index');
 	Route::get('delivery/create/{id}', 'DeliveryController@create');
 	Route::post('delivery/store', 'DeliveryController@store')->name('delivery.store');
+	Route::post('delivery/dayrange', 'DeliveryController@dayrange')->name('delivery.dayrange');
+	
+	
 	Route::get('delivery/{id}/edit', 'DeliveryController@edit');
 	Route::post('delivery/update', 'DeliveryController@update')->name('delivery.update');
 	Route::post('delivery/deletebyselection', 'DeliveryController@deleteBySelection');
@@ -147,10 +152,12 @@ Route::group(['middleware' => ['auth', 'active']], function() {
 	Route::resource('trucks', 'TruckController');
 	Route::get('trucks/{id}/transaction-details', 'TruckController@transactionDetails')->name('trucks.transactionDetails');
 	Route::get('trucks/{id}/day-transaction-details', 'TruckController@daytransactionDetails')->name('trucks.daytransactionDetails');
+	Route::post('trucks/date-transaction-details', 'TruckController@datetransactionDetails')->name('trucks.datetransactiondetails');
+	
 	Route::post('trucks/daytransaction', 'TruckController@daytransaction')->name('trucks.daytransaction');
 	Route::get('trucks/addpayment/{id}', 'TruckController@addpayment')->name('trucks.addpayment');
 	Route::post('trucks/add_payment', 'TruckController@add_payment')->name('trucks.add-payment');
-	Route::post('trucks/adjuststore', 'TruckController@adjuststore')->name('trucks.adjuststore');
+	Route::post('trucks/addqty', 'TruckController@addqty')->name('trucks.addqty');
 	Route::get('trucks/getsalestatus/{id}', 'TruckController@getsalestatus')->name('trucks.getsalestatus');	
 	Route::get('transfers/product_transfer/{id}','TransferController@productTransferData');
 	Route::get('transfers/transfer_by_csv', 'TransferController@transferByCsv');
@@ -159,7 +166,6 @@ Route::group(['middleware' => ['auth', 'active']], function() {
 	Route::get('transfers/getproduct/{id}', 'TransferController@getProduct')->name('transfer.getproduct');
 	Route::get('transfers/lims_product_search', 'TransferController@limsProductSearch')->name('product_transfer.search');
 	Route::post('transfers/deletebyselection', 'TransferController@deleteBySelection');
-	
 	Route::resource('transfers', 'TransferController');
 
 	Route::get('qty_adjustment/getproduct/{id}', 'AdjustmentController@getProduct')->name('adjustment.getproduct');
@@ -199,6 +205,8 @@ Route::group(['middleware' => ['auth', 'active']], function() {
 	Route::post('report/profit_loss', 'ReportController@profitLoss')->name('report.profitLoss');
 	Route::post('report/product_report', 'ReportController@productReport')->name('report.product');
 	Route::post('report/purchase', 'ReportController@purchaseReport')->name('report.purchase');
+	Route::post('report/sales_report', 'ReportController@salesReport')->name('report.sales');
+	Route::post('report/purchases_report', 'ReportController@purchasesReport')->name('report.purchases');
 	Route::post('report/sale_report', 'ReportController@saleReport')->name('report.sale');
 	Route::post('report/payment_report_by_date', 'ReportController@paymentReportByDate')->name('report.paymentByDate');
 	Route::post('report/warehouse_report', 'ReportController@warehouseReport')->name('report.warehouse');
@@ -277,10 +285,6 @@ Route::group(['middleware' => ['auth', 'active']], function() {
 	Route::get('event', 'EventController@index')->name('event.index');
 	Route::get('event/create', 'EventController@create')->name('event.create');
 	Route::post('event/store', 'EventController@store')->name('event.store');
-	// Route::get('calendar/view', 'CalendarController@view')->name('calendar.view');
-	// Route::get('calendar/edit/{id}', 'CalendarController@edit')->name('calendar.edit');
-	// Route::put('calendar/update/{id}', 'CalendarController@update')->name('calendar.update');
-	// Route::get('calendar/destroy/{id}', 'CalendarController@destroy')->name('calendar.destroy');
 	Route::post('event/deleteBySelection', 'EventController@deleteBySelection');
 	Route::resource('event', 'EventController');
 	Route::get('calendar', 'CalendarController@index')->name('calendar.index');

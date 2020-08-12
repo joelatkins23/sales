@@ -65,6 +65,8 @@
                                     <th>{{trans('file.reference')}}</th>
                                     <th>{{trans('file.Warehouse')}}</th>
                                     <th>{{trans('file.product')}} ({{trans('file.qty')}})</th>
+                                    <th>Units</th>
+                                    <th>Weight</th>
                                     <th>{{trans('file.grand total')}}</th>
                                     <th>{{trans('file.Paid')}}</th>
                                     <th>{{trans('file.Balance')}}</th>
@@ -101,6 +103,23 @@
                                         {{$product->name.' ('.$product_purchase_data->qty.' '.$unit->unit_code.')'}}<br>
                                         @endforeach
                                     </td>
+                                    <td>
+                                         @foreach($lims_product_purchase_data[$key] as $product_purchase_data)
+                                        <?php 
+                                            $unit = App\Unit::find($product_purchase_data->purchase_unit_id); 
+                                                                                     
+                                        ?>
+                                            {{$product_purchase_data->qty.' '.$unit->unit_code}}<br>
+                                        @endforeach
+                                    </td>
+                                    <td>
+                                        @foreach($lims_product_purchase_data[$key] as $product_purchase_data)
+                                        <?php 
+                                            $product = App\Product::select('weight')->find($product_purchase_data->product_id);   
+                                        ?>
+                                            {{$product_purchase_data->qty*$product->weight}}<br>
+                                        @endforeach
+                                    </td>
                                     <td>{{$purchase->grand_total}}</td>
                                     <td>{{$purchase->paid_amount}}</td>
                                     <td>{{number_format((float)($purchase->grand_total - $purchase->paid_amount), 2, '.', '')}}</td>
@@ -112,6 +131,8 @@
                                 <tr>
                                     <th></th>
                                     <th>Total:</th>
+                                    <th></th>
+                                    <th></th>
                                     <th></th>
                                     <th></th>
                                     <th></th>
@@ -386,14 +407,14 @@
         if (dt_selector.rows( '.selected' ).any() && is_calling_first) {
             var rows = dt_selector.rows( '.selected' ).indexes();
 
-            $( dt_selector.column( 5 ).footer() ).html(dt_selector.cells( rows, 5, { page: 'current' } ).data().sum().toFixed(2));
-            $( dt_selector.column( 6 ).footer() ).html(dt_selector.cells( rows, 6, { page: 'current' } ).data().sum().toFixed(2));
             $( dt_selector.column( 7 ).footer() ).html(dt_selector.cells( rows, 7, { page: 'current' } ).data().sum().toFixed(2));
+            $( dt_selector.column( 8 ).footer() ).html(dt_selector.cells( rows, 8, { page: 'current' } ).data().sum().toFixed(2));
+            $( dt_selector.column( 9 ).footer() ).html(dt_selector.cells( rows, 9, { page: 'current' } ).data().sum().toFixed(2));
         }
         else {
-            $( dt_selector.column( 5 ).footer() ).html(dt_selector.column( 5, {page:'current'} ).data().sum().toFixed(2));
-            $( dt_selector.column( 6 ).footer() ).html(dt_selector.column( 6, {page:'current'} ).data().sum().toFixed(2));
-            $( dt_selector.column( 7 ).footer() ).html(dt_selector.cells( rows, 7, { page: 'current' } ).data().sum().toFixed(2));
+            $( dt_selector.column( 7 ).footer() ).html(dt_selector.column( 7, {page:'current'} ).data().sum().toFixed(2));
+            $( dt_selector.column( 8 ).footer() ).html(dt_selector.column( 8, {page:'current'} ).data().sum().toFixed(2));
+            $( dt_selector.column( 9 ).footer() ).html(dt_selector.cells( rows, 9, { page: 'current' } ).data().sum().toFixed(2));
         }
     }
 
@@ -548,10 +569,10 @@
         if (dt_selector.rows( '.selected' ).any() && is_calling_first) {
             var rows = dt_selector.rows( '.selected' ).indexes();
 
-            $( dt_selector.column( 5 ).footer() ).html(dt_selector.cells( rows, 5, { page: 'current' } ).data().sum().toFixed(2));
+            $( dt_selector.column( 7 ).footer() ).html(dt_selector.cells( rows, 5, { page: 'current' } ).data().sum().toFixed(2));
         }
         else {
-            $( dt_selector.column( 5 ).footer() ).html(dt_selector.column( 5, {page:'current'} ).data().sum().toFixed(2));
+            $( dt_selector.column( 7 ).footer() ).html(dt_selector.column( 5, {page:'current'} ).data().sum().toFixed(2));
         }
     }
 
@@ -627,10 +648,10 @@
         if (dt_selector.rows( '.selected' ).any() && is_calling_first) {
             var rows = dt_selector.rows( '.selected' ).indexes();
 
-            $( dt_selector.column( 6 ).footer() ).html(dt_selector.cells( rows, 6, { page: 'current' } ).data().sum().toFixed(2));
+            $( dt_selector.column( 8 ).footer() ).html(dt_selector.cells( rows, 6, { page: 'current' } ).data().sum().toFixed(2));
         }
         else {
-            $( dt_selector.column( 6 ).footer() ).html(dt_selector.column( 6, {page:'current'} ).data().sum().toFixed(2));
+            $( dt_selector.column( 8 ).footer() ).html(dt_selector.column( 6, {page:'current'} ).data().sum().toFixed(2));
         }
     }
 

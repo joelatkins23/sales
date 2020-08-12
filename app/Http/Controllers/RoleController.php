@@ -755,7 +755,22 @@ class RoleController extends Controller
         }
         else
             $role->revokePermissionTo('supplier-report');
-
+        if($request->has('sales-report')){
+            $permission = Permission::firstOrCreate(['name' => 'sales-report']);
+            if(!$role->hasPermissionTo('sales-report')){
+                $role->givePermissionTo($permission);
+            }
+        }
+        else
+            $role->revokePermissionTo('sales-report');
+        if($request->has('purchases-report')){
+            $permission = Permission::firstOrCreate(['name' => 'purchases-report']);
+            if(!$role->hasPermissionTo('purchases-report')){
+                $role->givePermissionTo($permission);
+            }
+        }
+            else
+                $role->revokePermissionTo('purchases-report');
         if($request->has('due-report')){
             $permission = Permission::firstOrCreate(['name' => 'due-report']);
             if(!$role->hasPermissionTo('due-report')){

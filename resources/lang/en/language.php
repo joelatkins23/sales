@@ -63,6 +63,7 @@ return [
 	"Date" => "",
 	"Starting" => "",
 	"Ending" => "",
+	"Collect" => "",
 	"Print" => "",
 	"Barcode" => "",
 	"Supplier" => "",

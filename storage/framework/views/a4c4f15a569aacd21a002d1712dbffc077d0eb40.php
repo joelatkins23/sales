@@ -7,15 +7,39 @@
         <div class="card">
             <div class="card-header mt-2">
                 <h3 class="text-center"><?php echo e(trans('file.Transaction Details')); ?> [ <?php echo e($lims_truck_data->name); ?> ]</h3>
-            </div>    
+            </div>  
+            <?php echo Form::open(['route' => 'trucks.datetransactiondetails', 'method' => 'post']); ?>
+
+            <div class="row">
+                <div class="col-md-4 offset-md-3 mt-3">
+                    <div class="form-group row">
+                        <label class="d-tc mt-2"><strong><?php echo e(trans('file.Choose Your Date')); ?></strong> &nbsp;</label>
+                        <div class="d-tc">
+                            <div class="input-group">
+                                <input type="text" class="daterangepicker-field form-control" value="<?php echo e($start_date); ?> To <?php echo e($end_date); ?>" id="title_date" required />
+                                <input type="hidden" name="start_date" id="sstart" value="<?php echo e($start_date); ?>" />
+                                <input type="hidden" name="end_date" id="estart" value="<?php echo e($end_date); ?>" />
+                                <input type="hidden" name="id" id="id" value="<?php echo e($id); ?>" />
+                            </div>
+                        </div>
+                    </div>
+                </div>               
+                <div class="col-md-2 mt-3">
+                    <div class="form-group">
+                        <button class="btn btn-primary" type="submit"><?php echo e(trans('file.submit')); ?></button>
+                    </div>
+                </div>
+            </div>
+            <?php echo Form::close(); ?>                
             <div class="table-responsive mb-4">
                 <table id="transation-table" class="table table-hover">
                     <thead>
                         <tr>
                             <th class="not-exported-transaction"></th>
-                            <th><?php echo e(trans('file.Delivery')); ?> <?php echo e(trans('file.reference')); ?></th>
+                            <th><?php echo e(trans('file.Create')); ?> <?php echo e(trans('file.Date')); ?></th>
                             <th><?php echo e(trans('file.Sale')); ?> <?php echo e(trans('file.reference')); ?></th>
-                            <th><?php echo e(trans('file.product')); ?> (<?php echo e(trans('file.qty')); ?>)</th>
+                            <th>Customer Info</th>
+                            <th>Sale status</th>
                             <th><?php echo e(trans('file.grand total')); ?></th>
                             <th><?php echo e(trans('file.Paid')); ?></th>
                             <th><?php echo e(trans('file.Due')); ?></th>
@@ -25,32 +49,42 @@
                     <tbody>
                         <?php $__currentLoopData = $lims_truck_data->delivery; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key=>$delivery): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <?php
-                            $lims_product_sale_data = App\Product_Sale::where('sale_id', $delivery->sale->id)->get();
+                            // $lims_product_sale_data = App\Product_Sale::where('sale_id', $delivery->sale->id)->get();
+                            $total_address = $delivery->address;
+                            $result_customer = App\Customer::find($delivery->sale->customer_id);
+                        
+                            $create_date = explode(" ", $delivery->created_at)[0];
+                            $customer_info='';
+                             
+                            $customer_info = $result_customer->name;
+                            if($result_customer->zone)
+                                $customer_info .= ' ['.$result_customer->zone.']';
+                            if($result_customer->company_name)
+                                $customer_info .= ' ['.$result_customer->company_name.']';  
+                                // $sale_status= $delivery->sale_id;
+                            $sales = App\Sale::find($delivery->sale_id);
+                           
                         ?>
+                            
+                        
                         <tr >
-                            <?php if($delivery->status < 3): ?>
+                            <?php if($delivery->status): ?>
                             <td><?php echo e($key); ?></td>
-                            <td><?php echo e($delivery->reference_no); ?></td>
+                            <td><?php echo e($create_date); ?></td>
                             <td><?php echo e($delivery->sale->reference_no); ?></td>
+                            
                             <td>
-                                <?php $__currentLoopData = $lims_product_sale_data; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $product_sale_data): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                <?php 
-                                    $product = App\Product::select('name')->find($product_sale_data->product_id);
-                                    if($product_sale_data->variant_id) {
-                                        $variant = App\Variant::find($product_sale_data->variant_id);
-                                        $product->name .= ' ['.$variant->name.']'; 
-                                    }
-                                    $unit = App\Unit::find($product_sale_data->sale_unit_id);
-                                ?>
-                                <?php if($unit): ?>
-                                    <?php echo e($product->name.' ('.$product_sale_data->qty.' '.$unit->unit_code.')'); ?>
+                                <?php echo e($customer_info); ?>
 
-                                <?php else: ?>
-                                    <?php echo e($product->name.' ('.$product_sale_data->qty.')'); ?>
-
+                            </td>
+                            <td>
+                                <?php if($sales->sale_status == 1): ?>
+                                <div class="badge badge-success"><?php echo e(trans('file.Completed')); ?></div>
+                                <?php elseif($sales->sale_status == 2): ?>
+                                <div class="badge badge-danger"><?php echo e(trans('file.Pending')); ?></div>
+                                <?php elseif($sales->sale_status == 4): ?>
+                                <div class="badge badge-warning"><?php echo e(trans('file.Incomplete')); ?></div>
                                 <?php endif; ?>
-                                <br>
-                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </td>
                             <td><?php echo e($delivery->sale->grand_total); ?></td>
                             <td><?php echo e($delivery->sale->paid_amount); ?></td>
@@ -201,6 +235,7 @@
                         <select id="sale_status" name="sale_status" class="form-control">
                         <option value="1"><?php echo e(trans('file.Completed')); ?></option>
                         <option value="2"><?php echo e(trans('file.Pending')); ?></option>
+                        <option value="4"><?php echo e(trans('file.Incomplete')); ?></option>
                     </select>
                 </div>
                 <input type="hidden" name="sale_id">
@@ -228,6 +263,7 @@
                     <div class="col-md-6 form-group">
                         <label><strong><?php echo e(trans('file.Delivery Reference')); ?></strong></label>
                         <p id="dr"></p>
+                        <label><strong><?php echo e(trans('file.Date')); ?></strong><input type="text" data-date-format='yyyy-mm-dd' id="datepicker" name="create_date" class="form-control"></label>
                     </div>
                     <div class="col-md-6 form-group">
                         <label><strong><?php echo e(trans('file.Sale Reference')); ?></strong></label>
@@ -238,6 +274,7 @@
                         <select name="status" required class="form-control selectpicker">
                             <option value="2"><?php echo e(trans('file.Delivering')); ?></option>
                             <option value="3"><?php echo e(trans('file.Delivered')); ?></option>
+                            <option value="4"><?php echo e(trans('file.Collect')); ?></option>
                         </select>
                     </div>
                     <div class="col-md-6 form-group">
@@ -285,7 +322,9 @@
 </section>
 
 <script type="text/javascript">
-
+    $('#datepicker').datepicker({
+      dateFormat: 'yyyy-mm-dd'
+    });
     $('#transation-table').DataTable( {
         "order": [],
         'columnDefs': [
@@ -306,6 +345,7 @@
         buttons: [
             {
                 extend: 'pdf',
+                title: $('.text-center').text(),
                 exportOptions: {
                     columns: ':visible:Not(.not-exported-transaction)',
                     rows: ':visible'
@@ -372,14 +412,14 @@
     function datatable_sum_sale(dt_selector, is_calling_first) {
         if (dt_selector.rows( '.selected' ).any() && is_calling_first) {
             var rows = dt_selector.rows( '.selected' ).indexes();
-            $( dt_selector.column( 4 ).footer() ).html(dt_selector.cells( rows, 4, { page: 'current' } ).data().sum().toFixed(2));
             $( dt_selector.column( 5 ).footer() ).html(dt_selector.cells( rows, 5, { page: 'current' } ).data().sum().toFixed(2));
             $( dt_selector.column( 6 ).footer() ).html(dt_selector.cells( rows, 6, { page: 'current' } ).data().sum().toFixed(2));
+            $( dt_selector.column( 7 ).footer() ).html(dt_selector.cells( rows, 7, { page: 'current' } ).data().sum().toFixed(2));
         }
         else {            
-            $( dt_selector.column( 4 ).footer() ).html(dt_selector.column( 4, {page:'current'} ).data().sum().toFixed(2));
             $( dt_selector.column( 5 ).footer() ).html(dt_selector.column( 5, {page:'current'} ).data().sum().toFixed(2));
-            $( dt_selector.column( 6 ).footer() ).html(dt_selector.cells( rows, 6, { page: 'current' } ).data().sum().toFixed(2));
+            $( dt_selector.column( 6 ).footer() ).html(dt_selector.column( 6, {page:'current'} ).data().sum().toFixed(2));
+            $( dt_selector.column( 7 ).footer() ).html(dt_selector.cells( rows, 7, { page: 'current' } ).data().sum().toFixed(2));
         }
     }
     $(document).on("click", "table#transation-table tbody .add-payment", function(event) {
@@ -391,7 +431,7 @@
         rowindex = $(this).closest('tr').index();
         deposit = $('table#transation-table tbody tr:nth-child(' + (rowindex + 1) + ')').find('.deposit').val();
         var sale_id = $(this).data('id').toString();
-        var balance = $('table#transation-table tbody tr:nth-child(' + (rowindex + 1) + ')').find('td:nth-child(7)').text();
+        var balance = $('table#transation-table tbody tr:nth-child(' + (rowindex + 1) + ')').find('td:nth-child(8)').text();
         balance = parseFloat(balance.replace(/,/g, ''));
         $('input[name="paying_amount"]').val(balance);
         $('#add-payment input[name="balance"]').val(balance);
@@ -499,6 +539,20 @@
             $("#sale-status").modal('show');
         });
             
+    });
+    var prev_date = new Date();
+    prev_date.setDate(prev_date.getDate() + 30000);  
+    $(".daterangepicker-field").daterangepicker({
+        maxDate: prev_date,
+    callback: function(startDate, endDate, period){
+        var start_date = startDate.format('YYYY-MM-DD');
+        var end_date = endDate.format('YYYY-MM-DD');
+        var title = start_date + ' To ' + end_date;
+        $(".daterangepicker-field").val(title);
+        $('input[name="start_date"]').val(start_date);
+        $('input[name="end_date"]').val(end_date);
+        $('#title').val(title);
+    }
     });
 </script>
 <?php $__env->stopSection(); ?>

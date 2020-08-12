@@ -159,7 +159,7 @@
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label><strong>{{trans('file.Product Price')}} *</strong> </label>
-                                        <input type="number" name="price" required class="form-control" step="any">
+                                        <input type="number" name="price" id="enable-price" required class="form-control" step="any">
                                         <span class="validation-msg"></span>
                                     </div>
                                     <div class="form-group">
@@ -285,6 +285,9 @@
 
 <script type="text/javascript">
 
+    $("#lims_productcodeSearch").click(function(){        
+        $('#enable-price').removeAttr("disabled");
+    });
     $("ul#product").siblings('a').attr('aria-expanded','true');
     $("ul#product").addClass("show");
     $("ul#product #product-create-menu").addClass("active");

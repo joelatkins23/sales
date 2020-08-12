@@ -667,6 +667,26 @@
 						                    </div>
 						                    <label for="best-seller" class="padding05"><?php echo e(trans('file.Best Seller')); ?> &nbsp;&nbsp;</label>
 						                </span>
+										<span style="display:inline-block;">
+						                    <div class="text-center" aria-checked="false" aria-disabled="false">
+					                    	<?php if(in_array("sales-report", $all_permission)): ?>
+					                    	<input type="checkbox" value="1" class="checkbox" name="sales-report" checked>
+					                    	<?php else: ?>
+					                    	<input type="checkbox" value="1" class="checkbox" name="sales-report">
+					                    	<?php endif; ?>
+						                    </div>
+						                    <label for="sales-report" class="padding05"><?php echo e(trans('file.Sales Report')); ?> &nbsp;&nbsp;</label>
+						                </span>
+										<span style="display:inline-block;">
+						                    <div class="text-center" aria-checked="false" aria-disabled="false">
+					                    	<?php if(in_array("purchases-report", $all_permission)): ?>
+					                    	<input type="checkbox" value="1" class="checkbox" name="purchases-report" checked>
+					                    	<?php else: ?>
+					                    	<input type="checkbox" value="1" class="checkbox" name="purchases-report">
+					                    	<?php endif; ?>
+						                    </div>
+						                    <label for="purchases-report" class="padding05"><?php echo e(trans('file.Purchases Report')); ?> &nbsp;&nbsp;</label>
+						                </span>
 						                <span style="display:inline-block;">
 						                    <div class="text-center" aria-checked="false" aria-disabled="false">
 					                    	<?php if(in_array("daily-sale", $all_permission)): ?>

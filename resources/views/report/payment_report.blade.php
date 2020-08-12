@@ -29,9 +29,10 @@
                         <tr>
                             <th class="not-exported"></th>
                             <th>{{trans('file.Date')}}</th>
-                            <th>{{trans('file.Payment Reference')}} </th>
+                            <th>{{trans('file.customer')}} </th>
+                            <th>{{trans('file.Supplier')}} </th>                            
                             <th>{{trans('file.Sale Reference')}}</th>
-                            <th>{{trans('file.Purchase Reference')}}</th>
+                            <th>Payment Note</th>
                             <th>{{trans('file.Paid By')}}</th>
                             <th>{{trans('file.Amount')}}</th>
                             <th>{{trans('file.Created By')}}</th>
@@ -43,13 +44,16 @@
                             $sale = DB::table('sales')->find($payment->sale_id);
                             $purchase = DB::table('purchases')->find($payment->purchase_id);
                             $user = DB::table('users')->find($payment->user_id);
+                            $customer=DB::table('sales')->select('customers.*')->join("customers","sales.customer_id","=","customers.id","left")->where('sales.id',$payment->sale_id)->first();
+                            $suppliers=DB::table('purchases')->select('suppliers.*')->join("suppliers","purchases.supplier_id","=","suppliers.id","left")->where('purchases.id',$payment->purchase_id)->first();
                         ?>
                         <tr>
                             <td></td>
                             <td>{{date($general_setting->date_format, strtotime($payment->created_at->toDateString())) . ' '. $payment->created_at->toTimeString()}}</td>
-                            <td>{{$payment->payment_reference}}</td>
+                            <td>@if($customer){{$customer->name}}@endif</td>
+                            <td>@if($suppliers){{$suppliers->name}}@endif</td>
                             <td>@if($sale){{$sale->reference_no}}@endif</td>
-                            <td>@if($purchase){{$purchase->reference_no}}@endif</td>
+                            <td>{{$payment->payment_note}}</td>
                             <td>{{$payment->paying_method}}</td>
                             <td>{{$payment->amount}}</td>
                             <td>{{$user->name}}<br>{{$user->email}}</td>
